@@ -1,0 +1,58 @@
+name: musiku
+description: A new Flutter project.
+
+publish_to: "none"
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.3 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.2
+  dynamic_color: ^1.7.0
+  shared_preferences: ^2.2.2
+  http: ^0.13.5
+#    path: D:/code/android/flutter/http-0.13.5
+  path_provider: ^2.1.1
+  permission_handler: ^10.4.0
+  #  id3: ^1.0.2
+  #  audiotags: ^1.4.0
+  #  audio_duration: ^0.0.1
+  just_audio: ^0.9.37
+  #  id3_codec: ^1.0.0
+  #  flutter_media_metadata: ^1.0.0
+  #  flac_metadata: ^1.1.0
+  #  ffmpeg_wasm: ^1.0.1
+  flutter_ffmpeg: ^0.4.2
+#  fluttertoast: ^8.2.5
+  palette_generator: ^0.3.3
+#  audioplayers: ^5.2.1
+#    path: D:\code\android\flutter\audioplayers-5.2.1
+  audio_service: ^0.18.16
+#    path: D:\code\android\flutter\audio_service-0.18.16
+#  flutter_local_notifications: ^17.2.4
+#  player_notification: ^0.0.1
+#  just_audio_background: ^0.0.1-beta.13
+  flutter_launcher_icons: ^0.13.1
+  flutter_radio_player: ^2.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+
+flutter_launcher_icons:
+  image_path: "assets/icon/app_icon.png"  # 替换为你实际的图标文件路径
+  android: true  # 生成 Android 图标
+  ios: true  # 生成 iOS 图标
+  web:
+    generate: true  # 生成 Web 图标
+    image_path: "assets/icon/app_icon.png"  # Web 图标路径
