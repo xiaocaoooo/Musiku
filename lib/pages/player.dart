@@ -68,7 +68,7 @@ class _PlayerPageState extends State<PlayerPage> {
     setState(() {});
   }
 
-  Future<void> refresh({bool auto=false}) async {
+  Future<void> refresh({bool auto = false}) async {
     if (path != Global.playlist[Global.playingIndex]) {
       path = Global.playlist[Global.playingIndex];
       initData();
@@ -188,18 +188,22 @@ class _PlayerPageState extends State<PlayerPage> {
                                 width: 300,
                                 child: Row(
                                   children: [
-                                    Text((position~/60).toString(),
+                                    Text((position ~/ 60).toString(),
                                         style: TextStyle(
                                           fontSize: 18,
                                           color: Colors.white.withOpacity(0.6),
                                           fontFamily: "monospace",
                                         )),
-                                    Text(":", style: TextStyle(
+                                    Text(":",
+                                        style: TextStyle(
                                           fontSize: 18,
                                           color: Colors.white.withOpacity(0.6),
-                                    )),
+                                        )),
                                     Text(
-                                      (position%60).toInt().toString().padLeft(2, "0"),
+                                      (position % 60)
+                                          .toInt()
+                                          .toString()
+                                          .padLeft(2, "0"),
                                       style: TextStyle(
                                         fontSize: 18,
                                         color: Colors.white.withOpacity(0.6),
@@ -233,18 +237,22 @@ class _PlayerPageState extends State<PlayerPage> {
                                             });
                                           }),
                                     ),
-                                    Text((duration~/60).toString(),
+                                    Text((duration ~/ 60).toString(),
                                         style: TextStyle(
                                           fontSize: 18,
                                           color: Colors.white.withOpacity(0.6),
                                           fontFamily: "monospace",
                                         )),
-                                    Text(":", style: TextStyle(
-                                      fontSize: 18,
-                                      color: Colors.white.withOpacity(0.6),
-                                    )),
+                                    Text(":",
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          color: Colors.white.withOpacity(0.6),
+                                        )),
                                     Text(
-                                      (duration%60).toInt().toString().padLeft(2, "0"),
+                                      (duration % 60)
+                                          .toInt()
+                                          .toString()
+                                          .padLeft(2, "0"),
                                       style: TextStyle(
                                         fontSize: 18,
                                         color: Colors.white.withOpacity(0.6),
@@ -257,41 +265,47 @@ class _PlayerPageState extends State<PlayerPage> {
                       Container(
                           padding: const EdgeInsets.only(top: 48),
                           child: Row(
-                            children: [
-                              IconButton(
-                                icon: Icon(Icons.skip_previous,
-                                    color: Colors.white.withOpacity(0.6)),
-                                onPressed: () {
-                                  Global.player.previous();
-                                  refresh();
-                                  setState(() {});
-                                },
-                              ),
-                              IconButton(
-                                icon: Icon(Global.player.player.playing?Icons.play_arrow:Icons.pause,
-                                    color: Colors.white.withOpacity(0.6)),
-                                onPressed: () {
-                                  if (Global.player.player.playing) {
-                                    Global.player.player.pause();
-                                  } else {
-                                    Global.player.player.play();
-                                  }
-                                  refresh();
-                                  setState(() {});
-                                },
-                              ),
-                              IconButton(
-                                icon: Icon(Icons.skip_next,
-                                    color: Colors.white.withOpacity(0.6)),
-                                onPressed: () {
-                                  Global.player.next();
-                                  refresh();
-                                  setState(() {});
-                                },
-                              )
-                            ]
-                          )
-                      )
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                IconButton(
+                                  icon: Icon(Icons.skip_previous,
+                                      color: Colors.white.withOpacity(0.6),
+                                      size: 48),
+                                  onPressed: () {
+                                    Global.player.previous();
+                                    refresh();
+                                    setState(() {});
+                                  },
+                                ),
+                                IconButton(
+                                  icon: Icon(
+                                      Global.player.player.playing
+                                          ? Icons.pause
+                                          : Icons.play_arrow,
+                                      color: Colors.white.withOpacity(0.6),
+                                      size: 48),
+                                  onPressed: () {
+                                    if (Global.player.player.playing) {
+                                      Global.player.player.pause();
+                                    } else {
+                                      Global.player.player.play();
+                                    }
+                                    refresh();
+                                    setState(() {});
+                                  },
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.skip_next,
+                                      color: Colors.white.withOpacity(0.6),
+                                      size: 48),
+                                  onPressed: () {
+                                    Global.player.next();
+                                    refresh();
+                                    setState(() {});
+                                  },
+                                )
+                              ]))
                     ],
                   ));
             },
