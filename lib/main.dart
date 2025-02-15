@@ -1,6 +1,7 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:musiku/pages/lyric.dart';
 import 'package:permission_handler/permission_handler.dart'; // 导入权限处理包
 import 'package:musiku/const.dart';
 import 'package:musiku/global.dart';
@@ -100,6 +101,7 @@ class MyApp extends StatelessWidget {
           return PlayerPage(path: path);
         },
         // "/player": (context) => const PlayerPage(),
+        "/lyric": (context) => LyricPage(),
       },
     );
   }
