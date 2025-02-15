@@ -18,8 +18,7 @@ class PlayerPage extends StatefulWidget {
   State<PlayerPage> createState() => _PlayerPageState();
 }
 
-class _PlayerPageState extends State<PlayerPage>
-    with SingleTickerProviderStateMixin {
+class _PlayerPageState extends State<PlayerPage> with TickerProviderStateMixin {
   String path = "";
   String cover = "";
   String title = "";
@@ -37,6 +36,10 @@ class _PlayerPageState extends State<PlayerPage>
   // 新增动画控制器
   late AnimationController _scaleController;
   late Animation<double> _scaleAnimation;
+
+  // 新增下滑关闭动画控制器
+  late AnimationController _slideController;
+  late Animation<Offset> _slideAnimation;
 
   Future<void> initData() async {
     getMusicMetadata(path, cache: false);
@@ -124,6 +127,19 @@ class _PlayerPageState extends State<PlayerPage>
         curve: Curves.easeInOut,
       ),
     );
+
+    // 初始化下滑关闭动画控制器
+    _slideController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _slideAnimation = Tween<Offset>(
+      begin: Offset.zero,
+      end: const Offset(0, 1),
+    ).animate(CurvedAnimation(
+      parent: _slideController,
+      curve: Curves.easeOut,
+    ));
   }
 
   @override
@@ -136,243 +152,286 @@ class _PlayerPageState extends State<PlayerPage>
   void dispose() {
     // 释放动画控制器资源
     _scaleController.dispose();
+    _slideController.dispose();
     super.dispose();
+  }
+
+  void _handleVerticalDragUpdate(DragUpdateDetails details) {
+    if (details.delta.dy > 0) {
+      // 向下滑动
+      _slideController.value +=
+          details.primaryDelta! / MediaQuery.of(context).size.height;
+    } else if (details.delta.dy < 0) {
+      // 向上滑动
+      _slideController.value -=
+          details.primaryDelta! / MediaQuery.of(context).size.height;
+    }
+  }
+
+  void _handleVerticalDragEnd(DragEndDetails details) {
+    if (_slideController.value > 0.5) {
+      // 下滑超过一半，关闭页面
+      _slideController
+          .animateTo(1.0, duration: const Duration(milliseconds: 200))
+          .then((_) {
+        Navigator.of(context).pop();
+      });
+    } else {
+      // 下滑未超过一半，恢复原位
+      _slideController.animateTo(0.0,
+          duration: const Duration(milliseconds: 200));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(children: [
-        cover != ""
-            ? Image.file(
-                File(cover),
-                fit: BoxFit.cover,
-                width: double.infinity,
-                height: double.infinity,
-              )
-            : Container(),
-        BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 100, sigmaY: 100),
-          child: Container(
-            color: Colors.black.withOpacity(0.1),
+    return GestureDetector(
+      onVerticalDragUpdate: _handleVerticalDragUpdate,
+      onVerticalDragEnd: _handleVerticalDragEnd,
+      child: Scaffold(
+        body: Stack(children: [
+          cover != ""
+              ? Image.file(
+                  File(cover),
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: double.infinity,
+                )
+              : Container(),
+          BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 100, sigmaY: 100),
+            child: Container(
+              color: Colors.black.withOpacity(0.1),
+            ),
           ),
-        ),
-        SizedBox(
-          width: double.infinity,
-          height: double.infinity,
-          child: Builder(
-            builder: (BuildContext context) {
-              // 获取屏幕高度
-              double screenHeight = MediaQuery.of(context).size.height;
-              return Padding(
-                  padding: EdgeInsets.only(top: screenHeight * 0.18),
-                  child: Column(
-                    children: [
-                      // 使用 AnimatedBuilder 来应用动画
-                      AnimatedBuilder(
-                        animation: _scaleAnimation,
-                        builder: (context, child) {
-                          return Transform.scale(
-                            scale: _scaleAnimation.value,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.2),
-                                    spreadRadius: 5,
-                                    blurRadius: 7,
-                                    offset: const Offset(0, 3),
+          SlideTransition(
+            position: _slideAnimation,
+            child: SizedBox(
+              width: double.infinity,
+              height: double.infinity,
+              child: Builder(
+                builder: (BuildContext context) {
+                  // 获取屏幕高度
+                  double screenHeight = MediaQuery.of(context).size.height;
+                  return Padding(
+                      padding: EdgeInsets.only(top: screenHeight * 0.18),
+                      child: Column(
+                        children: [
+                          // 使用 AnimatedBuilder 来应用动画
+                          AnimatedBuilder(
+                            animation: _scaleAnimation,
+                            builder: (context, child) {
+                              return Transform.scale(
+                                scale: _scaleAnimation.value,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(16),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.2),
+                                        spreadRadius: 5,
+                                        blurRadius: 7,
+                                        offset: const Offset(0, 3),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                              child: ClipRRect(
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(16.0)),
-                                  clipBehavior: Clip.hardEdge,
-                                  child: Container(
-                                    decoration: const BoxDecoration(
-                                      borderRadius: BorderRadius.all(
+                                  child: ClipRRect(
+                                      borderRadius: const BorderRadius.all(
                                           Radius.circular(16.0)),
+                                      clipBehavior: Clip.hardEdge,
+                                      child: Container(
+                                        decoration: const BoxDecoration(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(16.0)),
+                                        ),
+                                        child: cover != ""
+                                            ? Image.file(
+                                                File(cover),
+                                                width: 300,
+                                                height: 300,
+                                              )
+                                            : Image.asset(
+                                                "assets/images/default_player_cover.jpg"),
+                                      )),
+                                ),
+                              );
+                            },
+                          ),
+                          Container(
+                              padding: const EdgeInsets.only(top: 48),
+                              child: Column(children: [
+                                SizedBox(
+                                  width: 300,
+                                  child: AutoScrollingText(
+                                    text: title,
+                                    style: TextStyle(
+                                      fontSize: 28,
+                                      color: Colors.white.withOpacity(0.8),
+                                      fontWeight: FontWeight.bold,
                                     ),
-                                    child: cover != ""
-                                        ? Image.file(
-                                            File(cover),
-                                            width: 300,
-                                            height: 300,
-                                          )
-                                        : Image.asset(
-                                            "assets/images/default_player_cover.jpg"),
-                                  )),
-                            ),
-                          );
-                        },
-                      ),
-                      Container(
-                          padding: const EdgeInsets.only(top: 48),
-                          child: Column(children: [
-                            SizedBox(
-                              width: 300,
-                              child: AutoScrollingText(
-                                text: title,
-                                style: TextStyle(
-                                  fontSize: 28,
-                                  color: Colors.white.withOpacity(0.8),
-                                  fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                              ),
-                            ),
-                            SizedBox(
-                              width: 300,
-                              child: AutoScrollingText(
-                                text: artist,
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.white.withOpacity(0.6),
+                                SizedBox(
+                                  width: 300,
+                                  child: AutoScrollingText(
+                                    text: artist,
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.white.withOpacity(0.6),
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-                          ])),
-                      Container(
-                          padding: const EdgeInsets.only(top: 48),
-                          child: Column(children: [
-                            SizedBox(
-                                width: 300,
-                                child: Row(
+                              ])),
+                          Container(
+                              padding: const EdgeInsets.only(top: 48),
+                              child: Column(children: [
+                                SizedBox(
+                                    width: 300,
+                                    child: Row(
+                                      children: [
+                                        Text((position ~/ 60).toString(),
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              color:
+                                                  Colors.white.withOpacity(0.6),
+                                              fontFamily: "monospace",
+                                            )),
+                                        Text(":",
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              color:
+                                                  Colors.white.withOpacity(0.6),
+                                            )),
+                                        Text(
+                                          (position % 60)
+                                              .toInt()
+                                              .toString()
+                                              .padLeft(2, "0"),
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            color:
+                                                Colors.white.withOpacity(0.6),
+                                            fontFamily: "monospace",
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Slider(
+                                              value: position,
+                                              min: 0,
+                                              max: duration,
+                                              activeColor: paletteGenerator
+                                                          .lightVibrantColor !=
+                                                      null
+                                                  ? paletteGenerator
+                                                      .lightVibrantColor?.color
+                                                      .withOpacity(0.4)
+                                                  : Colors.white
+                                                      .withOpacity(0.4),
+                                              inactiveColor:
+                                                  Colors.white.withOpacity(0.4),
+                                              thumbColor: paletteGenerator
+                                                          .lightVibrantColor !=
+                                                      null
+                                                  ? paletteGenerator
+                                                      .lightVibrantColor!.color
+                                                  : Colors.white,
+                                              label: position.toString(),
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  position = value;
+                                                });
+                                              }),
+                                        ),
+                                        Text((duration ~/ 60).toString(),
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              color:
+                                                  Colors.white.withOpacity(0.6),
+                                              fontFamily: "monospace",
+                                            )),
+                                        Text(":",
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              color:
+                                                  Colors.white.withOpacity(0.6),
+                                            )),
+                                        Text(
+                                          (duration % 60)
+                                              .toInt()
+                                              .toString()
+                                              .padLeft(2, "0"),
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            color:
+                                                Colors.white.withOpacity(0.6),
+                                            fontFamily: "monospace",
+                                          ),
+                                        ),
+                                      ],
+                                    )),
+                              ])),
+                          Container(
+                              padding: const EdgeInsets.only(top: 48),
+                              child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                    Text((position ~/ 60).toString(),
-                                        style: TextStyle(
-                                          fontSize: 18,
+                                    IconButton(
+                                      icon: Icon(Ionicons.play_skip_back,
                                           color: Colors.white.withOpacity(0.6),
-                                          fontFamily: "monospace",
-                                        )),
-                                    Text(":",
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          color: Colors.white.withOpacity(0.6),
-                                        )),
-                                    Text(
-                                      (position % 60)
-                                          .toInt()
-                                          .toString()
-                                          .padLeft(2, "0"),
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        color: Colors.white.withOpacity(0.6),
-                                        fontFamily: "monospace",
-                                      ),
+                                          size: 48),
+                                      onPressed: () {
+                                        Global.player.previous();
+                                        refresh();
+                                        setState(() {});
+                                      },
                                     ),
-                                    Expanded(
-                                      child: Slider(
-                                          value: position,
-                                          min: 0,
-                                          max: duration,
-                                          activeColor: paletteGenerator
-                                                      .lightVibrantColor !=
-                                                  null
-                                              ? paletteGenerator
-                                                  .lightVibrantColor?.color
-                                                  .withOpacity(0.4)
-                                              : Colors.white.withOpacity(0.4),
-                                          inactiveColor:
-                                              Colors.white.withOpacity(0.4),
-                                          thumbColor: paletteGenerator
-                                                      .lightVibrantColor !=
-                                                  null
-                                              ? paletteGenerator
-                                                  .lightVibrantColor!.color
-                                              : Colors.white,
-                                          label: position.toString(),
-                                          onChanged: (value) {
-                                            setState(() {
-                                              position = value;
-                                            });
-                                          }),
+                                    const SizedBox(width: 16),
+                                    IconButton(
+                                      icon: Transform.translate(
+                                          // 根据 playing 状态决定是否右移 12px
+                                          offset: Global.player.player.playing
+                                              ? const Offset(0, 0)
+                                              : const Offset(4, 0),
+                                          child: Icon(
+                                              Global.player.player.playing
+                                                  ? Ionicons.pause
+                                                  : Ionicons.play,
+                                              color:
+                                                  Colors.white.withOpacity(0.6),
+                                              size: 48)),
+                                      onPressed: () {
+                                        if (Global.player.player.playing) {
+                                          setScale(0.9);
+                                          Global.player.player.pause();
+                                        } else {
+                                          setScale(1);
+                                          Global.player.player.play();
+                                        }
+                                        refresh();
+                                        setState(() {});
+                                      },
                                     ),
-                                    Text((duration ~/ 60).toString(),
-                                        style: TextStyle(
-                                          fontSize: 18,
+                                    const SizedBox(width: 16),
+                                    IconButton(
+                                      icon: Icon(Ionicons.play_skip_forward,
                                           color: Colors.white.withOpacity(0.6),
-                                          fontFamily: "monospace",
-                                        )),
-                                    Text(":",
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          color: Colors.white.withOpacity(0.6),
-                                        )),
-                                    Text(
-                                      (duration % 60)
-                                          .toInt()
-                                          .toString()
-                                          .padLeft(2, "0"),
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        color: Colors.white.withOpacity(0.6),
-                                        fontFamily: "monospace",
-                                      ),
-                                    ),
-                                  ],
-                                )),
-                          ])),
-                      Container(
-                          padding: const EdgeInsets.only(top: 48),
-                          child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                IconButton(
-                                  icon: Icon(Ionicons.play_skip_back,
-                                      color: Colors.white.withOpacity(0.6),
-                                      size: 48),
-                                  onPressed: () {
-                                    Global.player.previous();
-                                    refresh();
-                                    setState(() {});
-                                  },
-                                ),
-                                const SizedBox(width: 16),
-                                IconButton(
-                                  icon: Transform.translate(
-                                      // 根据 playing 状态决定是否右移 12px
-                                      offset: Global.player.player.playing
-                                          ? const Offset(0, 0)
-                                          : const Offset(4, 0),
-                                      child: Icon(
-                                          Global.player.player.playing
-                                              ? Ionicons.pause
-                                              : Ionicons.play,
-                                          color: Colors.white.withOpacity(0.6),
-                                          size: 48)),
-                                  onPressed: () {
-                                    if (Global.player.player.playing) {
-                                      setScale(0.9);
-                                      Global.player.player.pause();
-                                    } else {
-                                      setScale(1);
-                                      Global.player.player.play();
-                                    }
-                                    refresh();
-                                    setState(() {});
-                                  },
-                                ),
-                                const SizedBox(width: 16),
-                                IconButton(
-                                  icon: Icon(Ionicons.play_skip_forward,
-                                      color: Colors.white.withOpacity(0.6),
-                                      size: 48),
-                                  onPressed: () {
-                                    Global.player.next();
-                                    refresh();
-                                    setState(() {});
-                                  },
-                                )
-                              ]))
-                    ],
-                  ));
-            },
-          ),
-        )
-      ]),
+                                          size: 48),
+                                      onPressed: () {
+                                        Global.player.next();
+                                        refresh();
+                                        setState(() {});
+                                      },
+                                    )
+                                  ]))
+                        ],
+                      ));
+                },
+              ),
+            ),
+          )
+        ]),
+      ),
     );
   }
 }
