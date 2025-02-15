@@ -30,7 +30,7 @@ class _PlayerPageState extends State<PlayerPage> with TickerProviderStateMixin {
 
   Color primaryColor = const Color(0xFF39C5BB);
   PaletteGenerator paletteGenerator =
-  PaletteGenerator.fromColors([PaletteColor(const Color(0xFF39C5BB), 1)]);
+      PaletteGenerator.fromColors([PaletteColor(const Color(0xFF39C5BB), 1)]);
 
   late AnimationController _scaleController;
   late Animation<double> _scaleAnimation;
@@ -129,19 +129,25 @@ class _PlayerPageState extends State<PlayerPage> with TickerProviderStateMixin {
   void _handleVerticalDragUpdate(DragUpdateDetails details) {
     if (details.delta.dy > 0) {
       // 仅处理下滑动作
-      _slideController.value += details.primaryDelta! / MediaQuery.of(context).size.height;
+      _slideController.value +=
+          details.primaryDelta! / MediaQuery.of(context).size.height;
     }
   }
 
   void _handleVerticalDragEnd(DragEndDetails details) {
-    if (_slideController.value > 0.5) {
-      // 下滑超过一半，关闭页面
-      _slideController.animateTo(1.0, duration: const Duration(milliseconds: 200)).then((_) {
+    // 设定一个速度阈值，可根据实际情况调整
+    const double velocityThreshold = 1000;
+    if (details.velocity.pixelsPerSecond.dy > velocityThreshold) {
+      // 下滑速度超过阈值，关闭页面
+      _slideController
+          .animateTo(1.0, duration: const Duration(milliseconds: 200))
+          .then((_) {
         Navigator.of(context).pop();
       });
     } else {
-      // 下滑未超过一半，恢复原位
-      _slideController.animateTo(0.0, duration: const Duration(milliseconds: 200));
+      // 下滑速度未超过阈值，恢复原位
+      _slideController.animateTo(0.0,
+          duration: const Duration(milliseconds: 200));
     }
   }
 
@@ -154,11 +160,11 @@ class _PlayerPageState extends State<PlayerPage> with TickerProviderStateMixin {
         body: Stack(children: [
           cover != ""
               ? Image.file(
-            File(cover),
-            fit: BoxFit.cover,
-            width: double.infinity,
-            height: double.infinity,
-          )
+                  File(cover),
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: double.infinity,
+                )
               : Container(),
           BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 100, sigmaY: 100),
@@ -206,12 +212,12 @@ class _PlayerPageState extends State<PlayerPage> with TickerProviderStateMixin {
                                     ),
                                     child: cover != ""
                                         ? Image.file(
-                                      File(cover),
-                                      width: 300,
-                                      height: 300,
-                                    )
+                                            File(cover),
+                                            width: 300,
+                                            height: 300,
+                                          )
                                         : Image.asset(
-                                        "assets/images/default_player_cover.jpg"),
+                                            "assets/images/default_player_cover.jpg"),
                                   ),
                                 ),
                               ),
@@ -282,19 +288,19 @@ class _PlayerPageState extends State<PlayerPage> with TickerProviderStateMixin {
                                         min: 0,
                                         max: duration,
                                         activeColor: paletteGenerator
-                                            .lightVibrantColor !=
-                                            null
+                                                    .lightVibrantColor !=
+                                                null
                                             ? paletteGenerator
-                                            .lightVibrantColor?.color
-                                            .withOpacity(0.4)
+                                                .lightVibrantColor?.color
+                                                .withOpacity(0.4)
                                             : Colors.white.withOpacity(0.4),
                                         inactiveColor:
-                                        Colors.white.withOpacity(0.4),
+                                            Colors.white.withOpacity(0.4),
                                         thumbColor: paletteGenerator
-                                            .lightVibrantColor !=
-                                            null
+                                                    .lightVibrantColor !=
+                                                null
                                             ? paletteGenerator
-                                            .lightVibrantColor!.color
+                                                .lightVibrantColor!.color
                                             : Colors.white,
                                         label: position.toString(),
                                         onChanged: (value) {

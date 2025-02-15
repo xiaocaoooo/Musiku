@@ -225,12 +225,14 @@ class _BottomNavigationExampleState extends State<BottomNavigationExample> {
         },
         children: _widgetOptions,
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.pushNamed(context, "/player");
-        },
-        child: const Icon(Icons.music_note),
-      ),
+      floatingActionButton: Global.playingIndex != -1
+          ? FloatingActionButton(
+              onPressed: () {
+                Navigator.pushNamed(context, "/player");
+              },
+              child: const Icon(Icons.music_note),
+            )
+          : null,
       bottomNavigationBar: NavigationBar(
         // 当前选中的索引
         selectedIndex: _selectedIndex,

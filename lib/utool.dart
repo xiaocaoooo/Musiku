@@ -10,7 +10,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
 
 Future<Map<String, dynamic>?> getMusicMetadata(String filePath,
-    {bool cache = true, int retry = 16}) async {
+    {bool cache = true, int retry = 5}) async {
   if (retry <= 0) {
     return null;
   }
