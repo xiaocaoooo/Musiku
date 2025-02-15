@@ -2,6 +2,7 @@ import 'dart:ffi';
 import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:ionicons/ionicons.dart';
 import 'package:musiku/auto_scrolling_text.dart';
 import 'package:musiku/global.dart';
 import 'package:musiku/utool.dart';
@@ -17,7 +18,8 @@ class PlayerPage extends StatefulWidget {
   State<PlayerPage> createState() => _PlayerPageState();
 }
 
-class _PlayerPageState extends State<PlayerPage> {
+class _PlayerPageState extends State<PlayerPage>
+    with SingleTickerProviderStateMixin {
   String path = "";
   String cover = "";
   String title = "";
@@ -25,17 +27,22 @@ class _PlayerPageState extends State<PlayerPage> {
   String album = "";
   double duration = 0;
   double position = 0;
+  double scale = 1;
 
   // double position = 0;
   Color primaryColor = const Color(0xFF39C5BB);
   PaletteGenerator paletteGenerator =
       PaletteGenerator.fromColors([PaletteColor(const Color(0xFF39C5BB), 1)]);
 
+  // 新增动画控制器
+  late AnimationController _scaleController;
+  late Animation<double> _scaleAnimation;
+
   Future<void> initData() async {
     getMusicMetadata(path, cache: false);
     cover = await getCover(path) ?? "";
     final meta = Global.musicInfo[path];
-    title = meta?["title"] ?? "";
+    title = meta?["title"] ?? path.split("/").last;
     artist = meta?["artist"] ?? "";
     album = meta?["album"] ?? "";
     duration = meta?["duration"].toDouble() ?? 0;
@@ -74,10 +81,27 @@ class _PlayerPageState extends State<PlayerPage> {
       initData();
     }
     position = Global.player.player.position.inSeconds.toDouble();
+    duration = Global.player.player.duration?.inSeconds.toDouble() ?? duration;
     setState(() {});
     if (auto) {
-      Future.delayed(const Duration(seconds: 1), refresh);
+      Future.delayed(const Duration(seconds: 1), () => refresh(auto: true));
     }
+  }
+
+  // 修改 setScale 方法，使用动画实现平滑切换
+  Future<void> setScale(double value) async {
+    _scaleController.reset();
+    _scaleAnimation = Tween<double>(begin: scale, end: value).animate(
+      CurvedAnimation(
+        parent: _scaleController,
+        curve: Curves.easeInOut, // 使用缓动曲线使动画更平滑
+      ),
+    );
+    setState(() {
+      scale = value;
+    });
+    // 启动动画
+    await _scaleController.forward();
   }
 
   void _init() {
@@ -88,12 +112,31 @@ class _PlayerPageState extends State<PlayerPage> {
       Global.player.player.play();
     }
     refresh(auto: true);
+    // 初始化动画控制器
+    _scaleController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200), // 动画持续时间
+    );
+    // 预先初始化 _scaleAnimation
+    _scaleAnimation = Tween<double>(begin: scale, end: scale).animate(
+      CurvedAnimation(
+        parent: _scaleController,
+        curve: Curves.easeInOut,
+      ),
+    );
   }
 
   @override
   void initState() {
     super.initState();
     _init();
+  }
+
+  @override
+  void dispose() {
+    // 释放动画控制器资源
+    _scaleController.dispose();
+    super.dispose();
   }
 
   @override
@@ -122,39 +165,48 @@ class _PlayerPageState extends State<PlayerPage> {
               // 获取屏幕高度
               double screenHeight = MediaQuery.of(context).size.height;
               return Padding(
-                  padding: EdgeInsets.only(top: screenHeight * 0.2),
+                  padding: EdgeInsets.only(top: screenHeight * 0.18),
                   child: Column(
                     children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              spreadRadius: 5,
-                              blurRadius: 7,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: ClipRRect(
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(16.0)),
-                            clipBehavior: Clip.hardEdge,
+                      // 使用 AnimatedBuilder 来应用动画
+                      AnimatedBuilder(
+                        animation: _scaleAnimation,
+                        builder: (context, child) {
+                          return Transform.scale(
+                            scale: _scaleAnimation.value,
                             child: Container(
-                              decoration: const BoxDecoration(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(16.0)),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.2),
+                                    spreadRadius: 5,
+                                    blurRadius: 7,
+                                    offset: const Offset(0, 3),
+                                  ),
+                                ],
                               ),
-                              child: cover != ""
-                                  ? Image.file(
-                                      File(cover),
-                                      width: 300,
-                                      height: 300,
-                                    )
-                                  : Image.asset(
-                                      "assets/images/default_player_cover.jpg"),
-                            )),
+                              child: ClipRRect(
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(16.0)),
+                                  clipBehavior: Clip.hardEdge,
+                                  child: Container(
+                                    decoration: const BoxDecoration(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(16.0)),
+                                    ),
+                                    child: cover != ""
+                                        ? Image.file(
+                                            File(cover),
+                                            width: 300,
+                                            height: 300,
+                                          )
+                                        : Image.asset(
+                                            "assets/images/default_player_cover.jpg"),
+                                  )),
+                            ),
+                          );
+                        },
                       ),
                       Container(
                           padding: const EdgeInsets.only(top: 48),
@@ -269,7 +321,7 @@ class _PlayerPageState extends State<PlayerPage> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 IconButton(
-                                  icon: Icon(Icons.skip_previous,
+                                  icon: Icon(Ionicons.play_skip_back,
                                       color: Colors.white.withOpacity(0.6),
                                       size: 48),
                                   onPressed: () {
@@ -278,25 +330,34 @@ class _PlayerPageState extends State<PlayerPage> {
                                     setState(() {});
                                   },
                                 ),
+                                const SizedBox(width: 16),
                                 IconButton(
-                                  icon: Icon(
-                                      Global.player.player.playing
-                                          ? Icons.pause
-                                          : Icons.play_arrow,
-                                      color: Colors.white.withOpacity(0.6),
-                                      size: 48),
+                                  icon: Transform.translate(
+                                      // 根据 playing 状态决定是否右移 12px
+                                      offset: Global.player.player.playing
+                                          ? const Offset(0, 0)
+                                          : const Offset(4, 0),
+                                      child: Icon(
+                                          Global.player.player.playing
+                                              ? Ionicons.pause
+                                              : Ionicons.play,
+                                          color: Colors.white.withOpacity(0.6),
+                                          size: 48)),
                                   onPressed: () {
                                     if (Global.player.player.playing) {
+                                      setScale(0.9);
                                       Global.player.player.pause();
                                     } else {
+                                      setScale(1);
                                       Global.player.player.play();
                                     }
                                     refresh();
                                     setState(() {});
                                   },
                                 ),
+                                const SizedBox(width: 16),
                                 IconButton(
-                                  icon: Icon(Icons.skip_next,
+                                  icon: Icon(Ionicons.play_skip_forward,
                                       color: Colors.white.withOpacity(0.6),
                                       size: 48),
                                   onPressed: () {
