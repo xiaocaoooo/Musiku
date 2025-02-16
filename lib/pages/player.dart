@@ -61,7 +61,7 @@ class _PlayerPageState extends State<PlayerPage> with TickerProviderStateMixin {
     duration = Global.player.player.duration?.inSeconds.toDouble() ?? duration;
     setState(() {});
     if (auto) {
-      Future.delayed(const Duration(seconds: 1), () => refresh(auto: true));
+      Future.delayed(const Duration(milliseconds: 500), () => refresh(auto: true));
     }
   }
 
@@ -127,11 +127,8 @@ class _PlayerPageState extends State<PlayerPage> with TickerProviderStateMixin {
   }
 
   void _handleVerticalDragUpdate(DragUpdateDetails details) {
-    if (details.delta.dy > 0) {
-      // 仅处理下滑动作
       _slideController.value +=
           details.primaryDelta! / MediaQuery.of(context).size.height;
-    }
   }
 
   void _handleVerticalDragEnd(DragEndDetails details) {
@@ -189,38 +186,42 @@ class _PlayerPageState extends State<PlayerPage> with TickerProviderStateMixin {
                           builder: (context, child) {
                             return Transform.scale(
                               scale: _scaleAnimation.value,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(16),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.2),
-                                      spreadRadius: 5,
-                                      blurRadius: 7,
-                                      offset: const Offset(0, 3),
-                                    ),
-                                  ],
-                                ),
-                                child: ClipRRect(
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(16.0)),
-                                  clipBehavior: Clip.hardEdge,
+                              child: InkWell(
+                                  onTap: () async {
+                                    Navigator.pushNamed(context, "/lyric");
+                                  },
                                   child: Container(
-                                    decoration: const BoxDecoration(
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(16.0)),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(16),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.2),
+                                          spreadRadius: 5,
+                                          blurRadius: 7,
+                                          offset: const Offset(0, 3),
+                                        ),
+                                      ],
                                     ),
-                                    child: cover != ""
-                                        ? Image.file(
-                                            File(cover),
-                                            width: 300,
-                                            height: 300,
-                                          )
-                                        : Image.asset(
-                                            "assets/images/default_player_cover.jpg"),
-                                  ),
-                                ),
-                              ),
+                                    child: ClipRRect(
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(16.0)),
+                                      clipBehavior: Clip.hardEdge,
+                                      child: Container(
+                                        decoration: const BoxDecoration(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(16.0)),
+                                        ),
+                                        child: cover != ""
+                                            ? Image.file(
+                                                File(cover),
+                                                width: 300,
+                                                height: 300,
+                                              )
+                                            : Image.asset(
+                                                "assets/images/default_player_cover.jpg"),
+                                      ),
+                                    ),
+                                  )),
                             );
                           },
                         ),
@@ -233,7 +234,7 @@ class _PlayerPageState extends State<PlayerPage> with TickerProviderStateMixin {
                                 child: AutoScrollingText(
                                   text: title,
                                   style: TextStyle(
-                                    fontSize: 28,
+                                    fontSize: 24,
                                     color: Colors.white.withOpacity(0.8),
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -286,7 +287,7 @@ class _PlayerPageState extends State<PlayerPage> with TickerProviderStateMixin {
                                       child: Slider(
                                         value: position,
                                         min: 0,
-                                        max: duration,
+                                        max: duration+1,
                                         activeColor: paletteGenerator
                                                     .lightVibrantColor !=
                                                 null
@@ -305,6 +306,8 @@ class _PlayerPageState extends State<PlayerPage> with TickerProviderStateMixin {
                                         label: position.toString(),
                                         onChanged: (value) {
                                           setState(() {
+                                            Global.player.seek(Duration(
+                                                seconds: value.toInt()));
                                             position = value;
                                           });
                                         },

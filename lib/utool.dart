@@ -121,15 +121,26 @@ String processDuration(int duration) {
   return '$minutes:${remainingSeconds.toString().padLeft(2, '0')}';
 }
 
-Future<String> getLyrics(String filePath) async {
+Future<String> getLyrics(String filePath, {int retry = 5}) async {
+  if (retry <= 0) {
+    return "";
+  }
   final FlutterFFprobe flutterFFprobe = FlutterFFprobe();
   final info = await flutterFFprobe.getMediaInformation(filePath);
   final mediaProperties = info.getMediaProperties();
   if (filePath.endsWith('.mp3')) {
+    if (mediaProperties?["tags"]["title"] == null) {
+      await Future.delayed(const Duration(seconds: 1));
+      return await getLyrics(filePath, retry: retry - 1);
+    }
     return mediaProperties?["tags"]["lyrics"] ??
         mediaProperties?["tags"]["lyrics-eng"] ??
         "";
   } else if (filePath.endsWith('.flac')) {
+    if (mediaProperties?["tags"]["TITLE"] == null) {
+      await Future.delayed(const Duration(seconds: 1));
+      return await getLyrics(filePath, retry: retry - 1);
+    }
     return mediaProperties?["tags"]["LYRICS"] ?? "";
   }
   return "";
@@ -269,6 +280,10 @@ Future<void> downloadFile(String url, String savePath) async {
   final response = await http.get(Uri.parse(url));
   final file = File(savePath);
   await file.writeAsBytes(response.bodyBytes);
+}
+
+double abs(double num) {
+  return num < 0 ? -num : num;
 }
 
 // Future<Map<String, dynamic>?> getMusicMetadata(String filePath) async {

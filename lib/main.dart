@@ -18,6 +18,7 @@ import 'package:musiku/pages/search.dart';
 import 'package:musiku/pages/settings.dart';
 import 'package:musiku/pages/text_page.dart';
 import 'package:musiku/usersettings.dart';
+import 'package:dynamic_color/dynamic_color.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -63,46 +64,103 @@ class MyApp extends StatelessWidget {
   // }
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-            seedColor: Theme.of(context).colorScheme.primary,
-            brightness: MediaQuery.of(context).platformBrightness),
-        useMaterial3: true,
-      ),
-      // theme: Global.themeData,
-      initialRoute: '/',
-      // home: const BottomNavigationExample(),
-      routes: {
-        '/': (context) => const BottomNavigationExample(),
-        '/home': (context) => const HomePage(),
-        '/more': (context) => const MorePage(),
-        "/settings": (context) => const Settings(),
-        "/info": (context) => const Info(),
-        "/debug": (context) => const Debug(),
-        "/settings/folders": (context) => const FoldersSettings(),
-        "/music": (context) => const MusicPage(),
-        "/playlist": (context) => const PlaylistPage(),
-        "/search": (context) => const SearchPage(),
-        "/music_list": (context) {
-          // 从路由参数中获取 path 参数
-          final String path =
+    // return MaterialApp(
+    //   theme: ThemeData(
+    //     colorScheme: ColorScheme.fromSeed(
+    //         // seedColor: Theme.of(context).colorScheme.primary,
+    //       seedColor: Color(0xFF39C5BB),
+    //         brightness: MediaQuery.of(context).platformBrightness),
+    //     useMaterial3: true,
+    //   ),
+    //   // theme: Global.themeData,
+    //   initialRoute: '/',
+    //   // home: const BottomNavigationExample(),
+    //   routes: {
+    //     '/': (context) => const BottomNavigationExample(),
+    //     '/home': (context) => const HomePage(),
+    //     '/more': (context) => const MorePage(),
+    //     "/settings": (context) => const Settings(),
+    //     "/info": (context) => const Info(),
+    //     "/debug": (context) => const Debug(),
+    //     "/settings/folders": (context) => const FoldersSettings(),
+    //     "/music": (context) => const MusicPage(),
+    //     "/playlist": (context) => const PlaylistPage(),
+    //     "/search": (context) => const SearchPage(),
+    //     "/music_list": (context) {
+    //       // 从路由参数中获取 path 参数
+    //       final String path =
+    //           ModalRoute.of(context)?.settings.arguments as String;
+    //       return MusicListPage(path: path);
+    //     },
+    //     "/text_page": (context) {
+    //       final String text =
+    //           ModalRoute.of(context)?.settings.arguments as String;
+    //       return TextPage(text: text);
+    //     },
+    //     "/player": (context) {
+    //       final String? path =
+    //           ModalRoute.of(context)?.settings.arguments as String?;
+    //       return PlayerPage(path: path);
+    //     },
+    //     // "/player": (context) => const PlayerPage(),
+    //     "/lyric": (context) => LyricPage(),
+    //   },
+    // );
+    return DynamicColorBuilder(
+      builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
+        return MaterialApp(
+          // theme: ThemeData(
+          //   colorScheme: ColorScheme.fromSeed(
+          //     // seedColor: Theme.of(context).colorScheme.primary,
+          //       seedColor: Color(0xFF39C5BB),
+          //       brightness: MediaQuery.of(context).platformBrightness),
+          //   useMaterial3: true,
+          // ),
+          theme: buildTheme(lightDynamic, false),
+          darkTheme: buildTheme(darkDynamic, true),
+          // theme: Global.themeData,
+          initialRoute: '/',
+          // home: const BottomNavigationExample(),
+          routes: {
+            '/': (context) => const BottomNavigationExample(),
+            '/home': (context) => const HomePage(),
+            '/more': (context) => const MorePage(),
+            "/settings": (context) => const Settings(),
+            "/info": (context) => const Info(),
+            "/debug": (context) => const Debug(),
+            "/settings/folders": (context) => const FoldersSettings(),
+            "/music": (context) => const MusicPage(),
+            "/playlist": (context) => const PlaylistPage(),
+            "/search": (context) => const SearchPage(),
+            "/music_list": (context) {
+              // 从路由参数中获取 path 参数
+              final String path =
               ModalRoute.of(context)?.settings.arguments as String;
-          return MusicListPage(path: path);
-        },
-        "/text_page": (context) {
-          final String text =
+              return MusicListPage(path: path);
+            },
+            "/text_page": (context) {
+              final String text =
               ModalRoute.of(context)?.settings.arguments as String;
-          return TextPage(text: text);
-        },
-        "/player": (context) {
-          final String? path =
+              return TextPage(text: text);
+            },
+            "/player": (context) {
+              final String? path =
               ModalRoute.of(context)?.settings.arguments as String?;
-          return PlayerPage(path: path);
-        },
-        // "/player": (context) => const PlayerPage(),
-        "/lyric": (context) => LyricPage(),
+              return PlayerPage(path: path);
+            },
+            // "/player": (context) => const PlayerPage(),
+            "/lyric": (context) => LyricPage(),
+          },
+        );
       },
+    );
+  }
+
+  ThemeData buildTheme(ColorScheme? dynamicScheme, bool isDarkMode) {
+    ColorScheme colorScheme = dynamicScheme ?? (isDarkMode ? ColorScheme.dark() : ColorScheme.light());
+    return ThemeData(
+      colorScheme: colorScheme,
+      useMaterial3: true,
     );
   }
 
@@ -198,16 +256,25 @@ class _BottomNavigationExampleState extends State<BottomNavigationExample> {
   @override
   Widget build(BuildContext context) {
     // 设置状态栏样式
-    WidgetsFlutterBinding.ensureInitialized();
-    // 根据系统主题模式设置底部导航栏颜色
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent, // 去除状态栏遮罩
-      statusBarIconBrightness: Brightness.dark, // 状态栏图标字体颜色
-      systemNavigationBarColor: Theme.of(context).colorScheme.surface,
-      // systemNavigationBarColor:
-      //     MediaQuery.of(context).platformBrightness == Brightness.light
-      //         ? Colors.white
-      //         : Colors.black,
+    // WidgetsFlutterBinding.ensureInitialized();
+    // // 根据系统主题模式设置底部导航栏颜色
+    // SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    //   statusBarColor: Colors.transparent, // 去除状态栏遮罩
+    //   statusBarIconBrightness: Brightness.dark, // 状态栏图标字体颜色
+    //   systemNavigationBarColor: Theme.of(context).colorScheme.surface,
+    //   // systemNavigationBarColor:
+    //   //     MediaQuery.of(context).platformBrightness == Brightness.light
+    //   //         ? Colors.white
+    //   //         : Colors.black,
+    // ));
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      // 设置状态栏和导航栏背景为透明
+      statusBarColor: Colors.transparent,
+      systemNavigationBarColor: Colors.transparent,
+      // 设置状态栏和导航栏图标颜色为白色
+      statusBarIconBrightness: Brightness.light,
+      systemNavigationBarIconBrightness: Brightness.light,
     ));
     return Scaffold(
       appBar: AppBar(

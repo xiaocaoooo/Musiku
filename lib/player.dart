@@ -12,6 +12,7 @@ class Player extends BaseAudioHandler
 
   void initState() {
     player.playbackEventStream.listen((event) {
+      print("playerevent:$event");
       switch (event.processingState) {
         //   播放结束
         case ProcessingState.completed:
