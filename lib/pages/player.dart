@@ -60,7 +60,7 @@ class _PlayerPageState extends State<PlayerPage> with TickerProviderStateMixin {
     position = Global.player.player.position.inSeconds.toDouble();
     duration = Global.player.player.duration?.inSeconds.toDouble() ?? duration;
     setState(() {});
-    if (auto) {
+    if (auto&&mounted) {
       Future.delayed(const Duration(milliseconds: 500), () => refresh(auto: true));
     }
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:musiku/music_info.dart';
 import 'package:musiku/utool.dart';
 
 import '../global.dart';
@@ -25,6 +26,20 @@ class _SearchResultState extends State<SearchResult> {
       }
     }
     // print("114514$results");
+    sort();
+  }
+
+  void sort() {
+    results.sort((a, b) {
+      final lastModifiedA = Global.musicInfo[a]["title"];
+      final lastModifiedB = Global.musicInfo[b]["title"];
+      return lastModifiedA.compareTo(lastModifiedB);
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
@@ -38,46 +53,7 @@ class _SearchResultState extends State<SearchResult> {
         itemCount: results.length,
         itemBuilder: (context, index) {
           return ListTile(
-            title: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                            Global.musicInfo[results[index]]?['title'] ??
-                                results[index].split('/').last,
-                            style: TextStyle(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSecondaryContainer,
-                            )),
-                        Text(Global.musicInfo[results[index]]?['artist'] ?? "",
-                            style: TextStyle(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSecondaryContainer
-                                  .withOpacity(.6),
-                            )),
-                      ]),
-                ),
-                Text(
-                  Global.musicInfo[results[index]]?['duration'] != null
-                      ? (Global.musicInfo[results[index]]?['duration'] != 0
-                          ? processDuration(
-                              Global.musicInfo[results[index]]?['duration']
-                                  .toInt())
-                          : "")
-                      : "",
-                  style: TextStyle(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSecondaryContainer
-                        .withOpacity(.6),
-                  ),
-                ),
-              ],
-            ),
+            title: MusicInfo(path: results[index]),
             onTap: () {
               Global.playlist = results;
               Global.playingIndex = index;

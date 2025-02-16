@@ -7,6 +7,8 @@ import 'package:musiku/global.dart';
 import 'package:musiku/usersettings.dart';
 import 'package:musiku/utool.dart';
 
+import '../music_info.dart';
+
 class MusicListPage extends StatefulWidget {
   // 添加 path 参数
   final String path;
@@ -58,36 +60,36 @@ class _MusicListPageState extends State<MusicListPage> {
       }
     }
     _sortMusicList();
-    if (widget.path == Const.all) {
-      final List<String> folders = await UserSettings.getFolders();
-      for (var folder in folders) {
-        final directory = Directory(folder);
-        final entities = await directory.list().toList();
-        final ml = entities
-            .where((entity) => FileSystemEntity.isFileSync(entity.path))
-            .map((entity) => entity.path)
-            .toList();
-        for (var music in ml) {
-          // await Future.delayed(const Duration(milliseconds: 10));
-          _processSingleMusic(music);
-        }
-      }
-    } else {
-      try {
-        final directory = Directory(widget.path);
-        final entities = await directory.list().toList();
-        final ml = entities
-            .where((entity) => FileSystemEntity.isFileSync(entity.path))
-            .map((entity) => entity.path)
-            .toList();
-        for (var music in ml) {
-          // await Future.delayed(const Duration(milliseconds: 10));
-          _processSingleMusic(music);
-        }
-      } catch (e) {
-        // print('Error: $e');
-      }
-    }
+    // if (widget.path == Const.all) {
+    //   final List<String> folders = await UserSettings.getFolders();
+    //   for (var folder in folders) {
+    //     final directory = Directory(folder);
+    //     final entities = await directory.list().toList();
+    //     final ml = entities
+    //         .where((entity) => FileSystemEntity.isFileSync(entity.path))
+    //         .map((entity) => entity.path)
+    //         .toList();
+    //     for (var music in ml) {
+    //       // await Future.delayed(const Duration(milliseconds: 10));
+    //       _processSingleMusic(music);
+    //     }
+    //   }
+    // } else {
+    //   try {
+    //     final directory = Directory(widget.path);
+    //     final entities = await directory.list().toList();
+    //     final ml = entities
+    //         .where((entity) => FileSystemEntity.isFileSync(entity.path))
+    //         .map((entity) => entity.path)
+    //         .toList();
+    //     for (var music in ml) {
+    //       // await Future.delayed(const Duration(milliseconds: 10));
+    //       _processSingleMusic(music);
+    //     }
+    //   } catch (e) {
+    //     // print('Error: $e');
+    //   }
+    // }
     // 排序操作
     _sortMusicList();
     setState(() {});
@@ -139,78 +141,29 @@ class _MusicListPageState extends State<MusicListPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (_processedMusicCount < _musicList.length) {
-      return Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircularProgressIndicator(
-                value: _processedMusicCount / _musicList.length,
-              ),
-              const SizedBox(height: 16),
-              Text('$_processedMusicCount/${_musicList.length}'),
-            ],
-          ),
-        ),
-      );
-    }
+    // if (_processedMusicCount < _musicList.length) {
+    //   return Scaffold(
+    //     body: Center(
+    //       child: Column(
+    //         mainAxisAlignment: MainAxisAlignment.center,
+    //         children: [
+    //           CircularProgressIndicator(
+    //             value: _processedMusicCount / _musicList.length,
+    //           ),
+    //           const SizedBox(height: 16),
+    //           Text('$_processedMusicCount/${_musicList.length}'),
+    //         ],
+    //       ),
+    //     ),
+    //   );
+    // }
     return Scaffold(
       body: SafeArea(
         child: ListView.builder(
           itemCount: _musicList.length,
           itemBuilder: (context, index) {
             return ListTile(
-              title: Row(
-                children: [
-                  // AspectRatio(
-                  //   aspectRatio: 1,
-                  //   child:Container(
-                  //     height: double.infinity,
-                  //     child:Image.asset(Global.coverCache[_musicList[index]] ??
-                  //         "assets/images/default_player_cover.jpg")
-                  //   ),
-                  // ),
-                  Expanded(
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                              Global.musicInfo[_musicList[index]]?['title'] ??
-                                  _musicList[index].split('/').last,
-                              style: TextStyle(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSecondaryContainer,
-                              )),
-                          Text(
-                              Global.musicInfo[_musicList[index]]?['artist'] ??
-                                  "",
-                              style: TextStyle(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSecondaryContainer
-                                    .withOpacity(.6),
-                              )),
-                        ]),
-                  ),
-                  Text(
-                    Global.musicInfo[_musicList[index]]?['duration'] != null
-                        ? (Global.musicInfo[_musicList[index]]?['duration'] != 0
-                            ? processDuration(Global
-                                .musicInfo[_musicList[index]]?['duration']
-                                .toInt())
-                            : "")
-                        : "",
-                    style: TextStyle(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSecondaryContainer
-                          .withOpacity(.6),
-                    ),
-                  ),
-                ],
-              ),
+              title: MusicInfo(path: _musicList[index]),
               onTap: () {
                 Global.playlist = _musicList;
                 Global.playingIndex = index;

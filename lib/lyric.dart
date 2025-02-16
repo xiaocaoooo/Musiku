@@ -57,7 +57,7 @@ class Lyrics {
 
         if (type == LyricType.lrc) {
           double startTime =
-          processTime(lines[i].substring(1, lines[i].indexOf("]")));
+              processTime(lines[i].substring(1, lines[i].indexOf("]")));
           double endTime = -1;
           if (i < lines.length - 1) {
             // 不是最后一句，结束时间以下一句歌词的开始时间为准
@@ -69,7 +69,7 @@ class Lyrics {
         } else if (type == LyricType.eslyric) {
           if (RegExp(r"<\d{2}:\d{2}\.\d{2}>.+").hasMatch(lines[i])) {
             double startTime =
-            processTime(lines[i].substring(1, lines[i].indexOf("]")));
+                processTime(lines[i].substring(1, lines[i].indexOf("]")));
             double endTime = -1;
             if (i < lines.length - 1) {
               // 不是最后一句，结束时间以下一句歌词的开始时间为准
@@ -79,19 +79,19 @@ class Lyrics {
             endTime = processTime("${lines[i].split("<").last}");
             List<LyricWord> words = [];
             Iterable<Match> matches =
-            RegExp(r"<\d{2}:\d{2}\.\d{2}>[^<]*").allMatches(lines[i]);
+                RegExp(r"<\d{2}:\d{2}\.\d{2}>[^<]*").allMatches(lines[i]);
             for (var match in matches) {
               double wordStartTime = processTime(
                   match.group(0)!.substring(1, match.group(0)!.indexOf(">")));
               String wordText =
-              match.group(0)!.substring(match.group(0)!.indexOf(">") + 1);
+                  match.group(0)!.substring(match.group(0)!.indexOf(">") + 1);
               words.add(LyricWord(wordText, wordStartTime, -1));
             }
             // endTime=words.last.endTime;
             lrcs.add(LyricESLyric(startTime, endTime, words));
           } else {
             double startTime =
-            processTime(lines[i].substring(1, lines[i].indexOf("]")));
+                processTime(lines[i].substring(1, lines[i].indexOf("]")));
             double endTime = -1;
             if (i < lines.length - 1) {
               // 不是最后一句，结束时间以下一句歌词的开始时间为准
@@ -200,17 +200,21 @@ class _LyricState extends State<Lyric> {
         return Padding(
           padding: padding,
           child: Container(
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              // shrinkWrap: true,
-              // physics: NeverScrollableScrollPhysics(),
-              itemCount: widget.lrc.words.length,
-              itemBuilder: (context, index) {
-                final word = widget.lrc.words[index];
-                return Text(word.text,
-                    style: textStyle.copyWith(color: secondaryColor));
-              },
+            child: Text(
+              widget.lrc.words.map((word) => word.text).join(),
+              style: textStyle.copyWith(color: secondaryColor),
             ),
+            // child: ListView.builder(
+            //   scrollDirection: Axis.horizontal,
+            //   // shrinkWrap: true,
+            //   // physics: NeverScrollableScrollPhysics(),
+            //   itemCount: widget.lrc.words.length,
+            //   itemBuilder: (context, index) {
+            //     final word = widget.lrc.words[index];
+            //     return Text(word.text,
+            //         style: textStyle.copyWith(color: secondaryColor));
+            //   },
+            // ),
           ),
         );
       }
@@ -244,16 +248,35 @@ class _LyricState extends State<Lyric> {
       return Padding(
         padding: padding,
         child: Container(
-          child: GradientText(
-            text: widget.lrc.words.map((word) => word.text).join(),
-            style: textStyle,
-            gradient: LinearGradient(
-              colors: [primaryColor, secondaryColor],
-              stops: [progress, progress],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-            ),
-          ),
+          child: Builder(builder: (context) {
+            List<Widget> children = [];
+            for (var i = 0; i < widget.lrc.words.length; i++) {
+              if (widget.time > widget.lrc.words[i].endTime) {
+                children.add(Text(widget.lrc.words[i].text,
+                    style: textStyle.copyWith(color: primaryColor)));
+              } else if (widget.time < widget.lrc.words[i].startTime) {
+                children.add(Text(widget.lrc.words[i].text,
+                    style: textStyle.copyWith(color: secondaryColor)));
+              } else {
+                children.add(Text(widget.lrc.words[i].text,
+                    style: textStyle.copyWith(color: primaryColor)));
+                // final wordProgress =
+                //     (widget.time - widget.lrc.words[i].startTime) /
+                //         (widget.lrc.words[i].endTime -
+                //             widget.lrc.words[i].startTime);
+                // children.add(GradientText(
+                //     text: widget.lrc.words[i].text,
+                //     style: textStyle,
+                //     gradient: LinearGradient(
+                //       colors: [primaryColor, secondaryColor],
+                //       stops: [wordProgress, wordProgress],
+                //       begin: Alignment.centerLeft,
+                //       end: Alignment.centerRight,
+                //     )));
+              }
+            }
+            return Wrap(direction: Axis.horizontal, children: children);
+          }),
         ),
       );
     }

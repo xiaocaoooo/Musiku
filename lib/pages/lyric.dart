@@ -38,6 +38,7 @@ class _LyricPageState extends State<LyricPage> {
   PaletteGenerator paletteGenerator =
       PaletteGenerator.fromColors([PaletteColor(const Color(0xFF39C5BB), 1)]);
   late ScrollController _scrollController;
+  bool exist = true;
 
   Future<void> initData() async {
     getMusicMetadata(path, cache: false);
@@ -56,7 +57,7 @@ class _LyricPageState extends State<LyricPage> {
   }
 
   Future<void> refresh({bool auto = false}) async {
-    if (auto) {
+    if (auto && mounted) {
       Future.delayed(const Duration(milliseconds: 50), () {
         refresh(auto: true);
       });
@@ -65,62 +66,64 @@ class _LyricPageState extends State<LyricPage> {
       path = Global.playlist[Global.playingIndex];
       initData();
     }
-
-    setState(() {
-      position = Global.player.player.position.inSeconds.toDouble();
-      duration =
-          Global.player.player.duration?.inSeconds.toDouble() ?? duration;
-      if (lyric != "") {
-        widgets = [
-          const SizedBox(
-            height: 200,
-          )
-        ];
-        lrcs = lyrics.lrcs;
-        for (int i = 0; i < lrcs.length; i++) {
-          if (lrcs[i].startTime <= position && position <= lrcs[i].endTime) {
-            idx = i;
+    if (mounted) {
+      setState(() {
+        position = Global.player.player.position.inSeconds.toDouble();
+        duration =
+            Global.player.player.duration?.inSeconds.toDouble() ?? duration;
+        if (lyric != "") {
+          widgets = [
+            const SizedBox(
+              height: 200,
+            )
+          ];
+          lrcs = lyrics.lrcs;
+          for (int i = 0; i < lrcs.length; i++) {
+            if (lrcs[i].startTime <= position && position <= lrcs[i].endTime) {
+              idx = i;
+            }
+            widgets.add(Lyric(
+              lrcs[i],
+              position,
+            ));
           }
-          widgets.add(Lyric(
-            lrcs[i],
-            position,
-          ));
+          if (lastIdx != idx) {
+            print("idx:$idx");
+            lastIdx = idx;
+            _scrollController.animateTo(
+              (48 * idx).toDouble(),
+              duration: const Duration(milliseconds: 500),
+              curve: Curves.easeInOut,
+            );
+          }
+          // print("idx:$idx");
+          // double progress = (position - widgets[idx].lrc.startTime) /
+          //     (widgets[idx].lrc.endTime - widgets[idx].lrc.startTime);
+          // widgets = [
+          //   // ClipRRect(
+          //   //     clipBehavior: Clip.hardEdge,
+          //   //     child: Container(height: max(48 * min(1-progress, 1), 0), child: widgets[idx - 5])),
+          //   ...widgets.sublist(max(idx - 5, 0))
+          // ];
         }
-        if (lastIdx != idx) {
-          print("idx:$idx");
-          lastIdx = idx;
-          _scrollController.animateTo(
-            (48 * idx).toDouble(),
-            duration: const Duration(milliseconds: 500),
-            curve: Curves.easeInOut,
-          );
-        }
-        // print("idx:$idx");
-        // double progress = (position - widgets[idx].lrc.startTime) /
-        //     (widgets[idx].lrc.endTime - widgets[idx].lrc.startTime);
-        // widgets = [
-        //   // ClipRRect(
-        //   //     clipBehavior: Clip.hardEdge,
-        //   //     child: Container(height: max(48 * min(1-progress, 1), 0), child: widgets[idx - 5])),
-        //   ...widgets.sublist(max(idx - 5, 0))
-        // ];
-      }
-    });
+      });
+    }
   }
 
   void _init() {
     _scrollController = ScrollController();
     path = Global.playlist[Global.playingIndex];
     initData();
-    refresh(auto: true);
-    // Timer.periodic(const Duration(milliseconds: 0), (timer) {
-    //   refresh(auto: true);
-    // });
+    // refresh(auto: true);
+    Timer.periodic(const Duration(milliseconds: 0), (timer) {
+      refresh(auto: true);
+    });
   }
 
   @override
   void initState() {
     super.initState();
+    refresh(auto: true);
     // WidgetsBinding.instance.addPersistentFrameCallback((_) {
     //   refresh();
     // });
@@ -130,6 +133,10 @@ class _LyricPageState extends State<LyricPage> {
   @override
   void dispose() {
     super.dispose();
+    // Timer.periodic(const Duration(milliseconds: 50), (timer) {
+    //   refresh(auto: true);
+    // }).cancel();
+    // exist=false;
   }
 
   @override
@@ -161,8 +168,8 @@ class _LyricPageState extends State<LyricPage> {
               // ),
               Expanded(
                   child: ListView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                controller: _scrollController,
+                // physics: const NeverScrollableScrollPhysics(),
+                // controller: _scrollController,
                 itemCount: widgets.length,
                 itemBuilder: (context, index) {
                   return widgets[index];
@@ -176,6 +183,7 @@ class _LyricPageState extends State<LyricPage> {
                 bottomLeft: Radius.circular(16),
                 bottomRight: Radius.circular(16)),
             clipBehavior: Clip.hardEdge,
+            // child: Container(
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
               child: SizedBox(
