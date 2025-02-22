@@ -3,8 +3,8 @@ import 'package:musiku/usersettings.dart';
 class Const {
   static bool initialized = false;
 
-  static String version = "alpha1.0.0";
-  static int versionCode = 10000;
+  static String version = "v1.0.0";
+  static int versionCode = 2001;
 
   static List<String> languages = ["en", "zh_cn"];
 
