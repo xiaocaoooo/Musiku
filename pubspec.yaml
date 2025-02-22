@@ -39,6 +39,7 @@ dependencies:
   flutter_launcher_icons: ^0.13.1
   flutter_radio_player: ^2.0.2
   ionicons: ^0.2.2
+  url_launcher: ^6.1.14
 
 dev_dependencies:
   flutter_test:
@@ -49,6 +50,11 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/
+    - assets/icon/
+  fonts:
+    - family: iconfont
+      fonts:
+        - asset: assets/fonts/iconfont.ttf
 
 flutter_launcher_icons:
   image_path: "assets/icon/app_icon.png"  # 替换为你实际的图标文件路径

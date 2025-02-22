@@ -12,7 +12,7 @@ class _MorePageState extends State<MorePage> {
   final List<List<String>> _settings = [
     [Const.settings, "/settings"],
     [Const.about, "/info"],
-    [Const.debug, "/debug"],
+    // [Const.debug, "/debug"],
   ];
   final List<IconData> _icons = [Icons.settings, Icons.info, Icons.bug_report];
 

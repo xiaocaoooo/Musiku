@@ -157,7 +157,7 @@ class MyApp extends StatelessWidget {
   }
 
   ThemeData buildTheme(ColorScheme? dynamicScheme, bool isDarkMode) {
-    ColorScheme colorScheme = dynamicScheme ?? (isDarkMode ? ColorScheme.dark() : ColorScheme.light());
+    ColorScheme colorScheme = dynamicScheme ?? (isDarkMode ? const ColorScheme.dark() : const ColorScheme.light());
     return ThemeData(
       colorScheme: colorScheme,
       useMaterial3: true,
@@ -244,10 +244,10 @@ class _BottomNavigationExampleState extends State<BottomNavigationExample> {
 
   // 定义不同页面的内容
   final List<Widget> _widgetOptions = <Widget>[
-    const HomePageWithKeepAlive(),
+    const HomePage(),
     const SearchPage(),
     const MusicPage(),
-    const PlaylistPage(),
+    // const PlaylistPage(),
     const MorePage()
   ];
 
@@ -325,10 +325,10 @@ class _BottomNavigationExampleState extends State<BottomNavigationExample> {
             icon: const Icon(Icons.library_music),
             label: Const.music,
           ),
-          NavigationDestination(
-            icon: const Icon(Icons.playlist_play),
-            label: Const.playlist,
-          ),
+          // NavigationDestination(
+          //   icon: const Icon(Icons.playlist_play),
+          //   label: Const.playlist,
+          // ),
           NavigationDestination(
             icon: const Icon(Icons.settings),
             label: Const.more,
@@ -346,21 +346,21 @@ class _BottomNavigationExampleState extends State<BottomNavigationExample> {
 }
 
 // 新的 HomePage 包装类，用于保持页面状态
-class HomePageWithKeepAlive extends StatefulWidget {
-  const HomePageWithKeepAlive({super.key});
-
-  @override
-  State<HomePageWithKeepAlive> createState() => _HomePageWithKeepAliveState();
-}
-
-class _HomePageWithKeepAliveState extends State<HomePageWithKeepAlive>
-    with AutomaticKeepAliveClientMixin {
-  @override
-  Widget build(BuildContext context) {
-    super.build(context);
-    return const HomePage();
-  }
-
-  @override
-  bool get wantKeepAlive => true;
-}
+// class HomePageWithKeepAlive extends StatefulWidget {
+//   const HomePageWithKeepAlive({super.key});
+//
+//   @override
+//   State<HomePageWithKeepAlive> createState() => _HomePageWithKeepAliveState();
+// }
+//
+// class _HomePageWithKeepAliveState extends State<HomePageWithKeepAlive>
+//     with AutomaticKeepAliveClientMixin {
+//   @override
+//   Widget build(BuildContext context) {
+//     super.build(context);
+//     return const HomePage();
+//   }
+//
+//   @override
+//   bool get wantKeepAlive => true;
+// }

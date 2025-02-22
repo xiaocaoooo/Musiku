@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:palette_generator/palette_generator.dart';
+import 'package:path_provider/path_provider.dart';
 import 'dart:convert';
 
 import '../utool.dart';
@@ -20,7 +21,8 @@ class _HomePageState extends State<HomePage> {
   String imagePath = '';
   String imageCopyright = '';
   String imageTitle = '';
-  PaletteGenerator? paletteGenerator;
+  // PaletteGenerator? paletteGenerator;
+  ThemeData? imageTheme;
 
   @override
   void initState() {
@@ -32,10 +34,30 @@ class _HomePageState extends State<HomePage> {
 
   // 发起网络请求获取公告信息
   Future<void> fetchAnnouncement() async {
+    Directory tempDir = await getTemporaryDirectory();
+    String filePath = '${tempDir.path}/announcement.json';
+    File file = File(filePath);
+    if (await file.exists()) {
+      // 文件存在，读取本地文件
+      String content = await file.readAsString();
+      final jsonData = json.decode(content);
+      final dataList = jsonData['data'] as List<dynamic>;
+      setState(() {
+        announcements = dataList.map((item) {
+          return {
+            'date': item['date'].toString(),
+            'content': item['content'].toString(),
+            'author': item['author'].toString(),
+          };
+        }).toList();
+      });
+    }
     try {
       final response = await http.get(Uri.parse(
           'https://xiaocaoooo.github.io/sankaplayer/announcement.json'));
       if (response.statusCode == 200) {
+        // 保存响应内容到本地文件
+        file.writeAsString(response.body);
         final jsonData = json.decode(response.body);
         final dataList = jsonData['data'] as List<dynamic>;
         setState(() {
@@ -61,16 +83,46 @@ class _HomePageState extends State<HomePage> {
     imagePath = (await getBingImage())!;
     imageCopyright = info["images"][0]["copyright"];
     imageTitle = info["images"][0]["title"];
+    setState(() {});
     fetchColor();
     setState(() {});
   }
 
   Future<void> fetchColor() async {
+    Directory tempDir = await getTemporaryDirectory();
+    await Directory('${tempDir.path}/bing').create(recursive: true);
+    String tempColorPath =
+        '${tempDir.path}/bing/${formatDate(DateTime.now())}.color';
+    File file = File(tempColorPath);
+    if (await file.exists()) {
+      // 文件存在，读取本地文件
+      String content = await file.readAsString();
+      int color = int.parse(content);
+      setState(() {
+        // paletteGenerator = pg;
+        imageTheme = ThemeData(
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: Color(color),
+            brightness: Theme.of(context).brightness,
+          ),
+          useMaterial3: true,
+        );
+      });
+      return;
+    }
     try {
       final pg = await getPaletteGeneratorFromImage(imagePath);
       if (pg != null) {
+        file.writeAsString(pg.dominantColor!.color.value.toString());
         setState(() {
-          paletteGenerator = pg;
+          // paletteGenerator = pg;
+          imageTheme = ThemeData(
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: pg.dominantColor!.color,
+              brightness: Theme.of(context).brightness,
+            ),
+            useMaterial3: true,
+          );
         });
       }
     } catch (e) {
@@ -80,7 +132,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    bool isDark = Theme.of(context).brightness == Brightness.dark;
+    // fetchColor();
     return Scaffold(
         // appBar: AppBar(title: const Text("Home")),
         body: SafeArea(
@@ -98,13 +150,11 @@ class _HomePageState extends State<HomePage> {
                     width: double.infinity,
                     height: null,
                     decoration: BoxDecoration(
-                      color: paletteGenerator != null
-                          ? (isDark
-                          ? paletteGenerator
-                          ?.darkVibrantColor?.color
-                          : paletteGenerator
-                          ?.lightVibrantColor?.color)
-                          : Theme.of(context).colorScheme.primaryContainer,
+                      color: imageTheme != null
+                          ? imageTheme!.colorScheme.primaryContainer
+                          : Theme.of(context)
+                          .colorScheme
+                          .primaryContainer,
                       borderRadius:
                           const BorderRadius.all(Radius.circular(16.0)),
                     ),
@@ -127,12 +177,8 @@ class _HomePageState extends State<HomePage> {
                                   Text(
                                     imageTitle,
                                     style: TextStyle(
-                                        color: paletteGenerator != null
-                                            ? (isDark
-                                                ? paletteGenerator
-                                                    ?.lightVibrantColor?.color
-                                                : paletteGenerator
-                                                    ?.darkVibrantColor?.color)
+                                        color: imageTheme != null
+                                            ? imageTheme!.colorScheme.onPrimaryContainer
                                             : Theme.of(context)
                                                 .colorScheme
                                                 .onPrimaryContainer),
@@ -141,18 +187,12 @@ class _HomePageState extends State<HomePage> {
                                   Text(
                                     imageCopyright,
                                     style: TextStyle(
-                                        color: (paletteGenerator != null
-                                                ? (isDark
-                                                    ? paletteGenerator
-                                                        ?.lightVibrantColor
-                                                        ?.color
-                                                    : paletteGenerator
-                                                        ?.darkVibrantColor
-                                                        ?.color)
-                                                : Theme.of(context)
-                                                    .colorScheme
-                                                    .onPrimaryContainer)
-                                            ?.withOpacity(0.6),
+                                        color: (imageTheme != null
+                                            ? imageTheme!.colorScheme.onPrimaryContainer
+                                            : Theme.of(context)
+                                            .colorScheme
+                                            .onPrimaryContainer)
+                                            .withOpacity(0.6),
                                         fontSize: 10.0),
                                   )
                                 ]),
