@@ -30,13 +30,21 @@ class _MorePageState extends State<MorePage> {
                   height: null,
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.primaryContainer,
-                    borderRadius: const BorderRadius.all(Radius.circular(16.0)),
+                    borderRadius: const BorderRadius.all(Radius.circular(32.0)),
                   ),
                   child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(16.0),
+                              child: Image.asset("assets/icon/app_icon.png",
+                                  width: 64.0, height: 64.0),
+                            ),
+                            const SizedBox(
+                              width: 4,
+                            ),
                             Text(Const.appName,
                                 style: TextStyle(
                                     color: Theme.of(context)
@@ -44,6 +52,7 @@ class _MorePageState extends State<MorePage> {
                                         .onPrimaryContainer,
                                     fontSize: 24.0,
                                     fontWeight: FontWeight.bold)),
+                            Expanded(child: Container()),
                             Text(Const.version,
                                 style: TextStyle(
                                   color: Theme.of(context)

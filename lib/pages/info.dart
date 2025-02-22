@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ionicons/ionicons.dart';
+import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 
 class Info extends StatefulWidget {
@@ -10,28 +10,111 @@ class Info extends StatefulWidget {
 }
 
 class _InfoState extends State<Info> {
+  Future<String> getGroupNumber() async {
+    final response =
+        await http.get(Uri.parse('https://xiaocaoooo.github.io/musiku/qq'));
+    if (response.statusCode == 200) {
+      return response.body.replaceAll("\n", "");
+    } else {
+      throw Exception('Failed to load group number');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-      List<List<dynamic>> _items=[
-        ["QQ", Icon(
-          const IconData(0x33, fontFamily: 'iconfont'),
-          size: 50,
-          color: Theme.of(context).colorScheme.onSecondaryContainer,
-        ), () async {
-          String groupNumber = '123456789'; // 替换为你的群号
-          String url = 'mqqapi://card/show_pslcard?src_type=internal&version=1&uin=${groupNumber}&card_type=group&source=qrcode';
-
-          if (await canLaunch(url)) {
-            await launch(url);
-          } else {
-            throw '无法打开 QQ 群聊';
+    List<List<dynamic>> _items = [
+      [
+        "QQ",
+        Icons.chat_rounded,
+        () async {
+          try {
+            String groupNumber = await getGroupNumber();
+            String url =
+                'mqqapi://card/show_pslcard?src_type=internal&version=1&uin=${groupNumber}&card_type=group&source=qrcode';
+            // String url = "https://xiaocaoooo.github.io";
+            print(url);
+            if (!await launchUrl(Uri.parse(url))) {
+              // 提示用户安装 QQ 应用
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: const Text('无法打开链接'),
+                    content: const Text('请确保你已经安装了QQ应用。'),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('确定'),
+                      ),
+                    ],
+                  );
+                },
+              );
+            }
+          } catch (e) {
+            print('Error: $e');
           }
-        }],
-      ];
+        }
+      ],
+      [
+        "Github",
+        Icons.star,
+        () async {
+          try {
+            String url = "https://github.com/xiaocaoooo/Musiku";
+            print(url);
+            if (!await launchUrl(Uri.parse(url))) {
+              // 提示用户安装 QQ 应用
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: const Text('无法打开链接'),
+                    content: const Text('请确保你已经安装了浏览器。'),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('确定'),
+                      ),
+                    ],
+                  );
+                },
+              );
+            }
+          } catch (e) {
+            print('Error: $e');
+          }
+        }
+      ],
+    ];
+
     return Scaffold(
       appBar: AppBar(title: const Text("About")),
       body: SafeArea(
-        child: Container(),
+        child: ListView.builder(
+          itemCount: _items.length,
+          itemBuilder: (BuildContext context, int index) {
+            return ListTile(
+              leading: Icon(
+                _items[index][1],
+                size: 30,
+                color: Theme.of(context).colorScheme.onSecondaryContainer,
+              ),
+              title: Text(
+                _items[index][0],
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSecondaryContainer),
+              ),
+              trailing: Icon(Icons.chevron_right,
+                  color: Theme.of(context).colorScheme.onSecondaryContainer),
+              onTap: _items[index][2],
+            );
+          },
+        ),
       ),
     );
   }

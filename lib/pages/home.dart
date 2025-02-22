@@ -54,7 +54,7 @@ class _HomePageState extends State<HomePage> {
     }
     try {
       final response = await http.get(Uri.parse(
-          'https://xiaocaoooo.github.io/sankaplayer/announcement.json'));
+          'https://xiaocaoooo.github.io/musiku/announcement.json'));
       if (response.statusCode == 200) {
         // 保存响应内容到本地文件
         file.writeAsString(response.body);

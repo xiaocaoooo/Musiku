@@ -28,7 +28,7 @@ class UserSettings {
       await prefs.setInt(_homePageIndex, 0);
     }
     if (!prefs.containsKey(_languageKey)) {
-      await prefs.setString(_languageKey, 'en');
+      await prefs.setString(_languageKey, 'zh_cn');
     }
     if (!prefs.containsKey(_foldersKey)) {
       await prefs.setStringList(_foldersKey, ['/storage/emulated/0/Music/']);
@@ -83,7 +83,7 @@ class UserSettings {
 
   static Future<String> getLanguage() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_languageKey) ?? 'en';
+    return prefs.getString(_languageKey) ?? 'zh_cn';
   }
 
   static Future<void> setLanguage(String language) async {
