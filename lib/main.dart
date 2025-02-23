@@ -310,7 +310,7 @@ class _AppState extends State<App> {
           : null,
       bottomNavigationBar: ClipRRect(
         child:BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
           child: NavigationBar(
             // backgroundColor: Colors.transparent,
             // elevation: 0,

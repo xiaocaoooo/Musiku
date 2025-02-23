@@ -78,14 +78,25 @@ class Lyrics {
             }
             endTime = processTime("${lines[i].split("<").last}");
             List<LyricWord> words = [];
-            Iterable<Match> matches =
-                RegExp(r"<\d{2}:\d{2}\.\d{2}>[^<]*").allMatches(lines[i]);
-            for (var match in matches) {
+            List<Match> matches = RegExp(r"<\d{2}:\d{2}\.\d{2}>[^<]*")
+                .allMatches(lines[i])
+                .toList();
+            for (var i = 0; i < matches.length; i++) {
+              Match match = matches[i];
               double wordStartTime = processTime(
                   match.group(0)!.substring(1, match.group(0)!.indexOf(">")));
               String wordText =
                   match.group(0)!.substring(match.group(0)!.indexOf(">") + 1);
-              words.add(LyricWord(wordText, wordStartTime, -1));
+              if (i < matches.length - 1) {
+                words.add(LyricWord(
+                    wordText,
+                    wordStartTime,
+                    processTime(matches[i + 1]
+                        .group(0)!
+                        .substring(1, matches[i + 1].group(0)!.indexOf(">")))));
+              } else {
+                words.add(LyricWord(wordText, wordStartTime, endTime));
+              }
             }
             // endTime=words.last.endTime;
             lrcs.add(LyricESLyric(startTime, endTime, words));
@@ -252,14 +263,16 @@ class _LyricState extends State<Lyric> {
             List<Widget> children = [];
             for (var i = 0; i < widget.lrc.words.length; i++) {
               if (widget.time > widget.lrc.words[i].endTime) {
-                children.add(Text(widget.lrc.words[i].text,
-                    style: textStyle.copyWith(color: primaryColor)));
+                children.add(Text(
+                    widget.lrc.words[i].text +
+                        widget.lrc.words[i].endTime.toString(),
+                    style: textStyle.copyWith(color: Colors.red)));
               } else if (widget.time < widget.lrc.words[i].startTime) {
                 children.add(Text(widget.lrc.words[i].text,
                     style: textStyle.copyWith(color: secondaryColor)));
               } else {
                 children.add(Text(widget.lrc.words[i].text,
-                    style: textStyle.copyWith(color: primaryColor)));
+                    style: textStyle.copyWith(color: Colors.green)));
                 // final wordProgress =
                 //     (widget.time - widget.lrc.words[i].startTime) /
                 //         (widget.lrc.words[i].endTime -
@@ -275,6 +288,7 @@ class _LyricState extends State<Lyric> {
                 //     )));
               }
             }
+            children.add(Text(progress.toString()));
             return Wrap(direction: Axis.horizontal, children: children);
           }),
         ),

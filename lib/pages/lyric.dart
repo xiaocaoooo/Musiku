@@ -115,15 +115,18 @@ class _LyricPageState extends State<LyricPage> {
     path = Global.playlist[Global.playingIndex];
     initData();
     // refresh(auto: true);
-    Timer.periodic(const Duration(milliseconds: 0), (timer) {
-      refresh(auto: true);
-    });
+    // Timer.periodic(const Duration(milliseconds: 0), (timer) {
+    //   refresh(auto: true);
+    // });
   }
 
   @override
   void initState() {
     super.initState();
-    refresh(auto: true);
+    Future.delayed(Duration(seconds: 3), () {
+      refresh();
+    });
+    // refresh(auto: true);
     // WidgetsBinding.instance.addPersistentFrameCallback((_) {
     //   refresh();
     // });
