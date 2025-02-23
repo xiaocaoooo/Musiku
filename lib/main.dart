@@ -1,6 +1,7 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:musiku/pages/index.dart';
 import 'package:musiku/pages/lyric.dart';
 import 'package:permission_handler/permission_handler.dart'; // 导入权限处理包
 import 'package:musiku/const.dart';
@@ -135,21 +136,22 @@ class MyApp extends StatelessWidget {
             "/music_list": (context) {
               // 从路由参数中获取 path 参数
               final String path =
-              ModalRoute.of(context)?.settings.arguments as String;
+                  ModalRoute.of(context)?.settings.arguments as String;
               return MusicListPage(path: path);
             },
             "/text_page": (context) {
               final String text =
-              ModalRoute.of(context)?.settings.arguments as String;
+                  ModalRoute.of(context)?.settings.arguments as String;
               return TextPage(text: text);
             },
             "/player": (context) {
               final String? path =
-              ModalRoute.of(context)?.settings.arguments as String?;
+                  ModalRoute.of(context)?.settings.arguments as String?;
               return PlayerPage(path: path);
             },
             // "/player": (context) => const PlayerPage(),
             "/lyric": (context) => LyricPage(),
+            "/index": (context) => const IndexPage(),
           },
         );
       },
@@ -157,7 +159,8 @@ class MyApp extends StatelessWidget {
   }
 
   ThemeData buildTheme(ColorScheme? dynamicScheme, bool isDarkMode) {
-    ColorScheme colorScheme = dynamicScheme ?? (isDarkMode ? const ColorScheme.dark() : const ColorScheme.light());
+    ColorScheme colorScheme = dynamicScheme ??
+        (isDarkMode ? const ColorScheme.dark() : const ColorScheme.light());
     return ThemeData(
       colorScheme: colorScheme,
       useMaterial3: true,

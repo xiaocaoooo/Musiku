@@ -12,9 +12,10 @@ class _MorePageState extends State<MorePage> {
   final List<List<String>> _settings = [
     [Const.settings, "/settings"],
     [Const.about, "/info"],
+    [Const.index, "/index"]
     // [Const.debug, "/debug"],
   ];
-  final List<IconData> _icons = [Icons.settings, Icons.info, Icons.bug_report];
+  final List<IconData> _icons = [Icons.settings, Icons.info, Icons.music_note];
 
   @override
   Widget build(BuildContext context) {

@@ -29,6 +29,7 @@ class Const {
   static String cancel = "Cancel";
   static String ok = "OK";
   static String all = "All";
+  static String index = "Index";
 
   static Future<void> init() async {
     if (!initialized) {
@@ -56,6 +57,7 @@ class Const {
         cancel = ZhCn.cancel;
         ok = ZhCn.ok;
         all = ZhCn.all;
+        index = ZhCn.index;
       } else {
         appName = En.appName;
         home = En.home;
@@ -78,6 +80,7 @@ class Const {
         cancel = En.cancel;
         ok = En.ok;
         all = En.all;
+        index = En.index;
       }
     }
   }
@@ -105,6 +108,7 @@ class ZhCn {
   static String cancel = "取消";
   static String ok = "确定";
   static String all = "全部";
+  static String index = "索引";
 }
 
 class En {
@@ -129,4 +133,5 @@ class En {
   static String cancel = "Cancel";
   static String ok = "OK";
   static String all = "All";
+  static String index = "Index";
 }

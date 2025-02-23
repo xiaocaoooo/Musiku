@@ -16,8 +16,12 @@ class MusicInfo extends StatefulWidget {
 
 class _MusicInfoState extends State<MusicInfo> {
   void _init() async {
-    await getMusicMetadata(widget.path);
-    await getCover(widget.path);
+    if (!Global.musicInfo.containsKey(widget.path)) {
+      await getMusicMetadata(widget.path);
+    }
+    if (!Global.coverCache.containsKey(widget.path)) {
+      await getCover(widget.path);
+    }
     setState(() {});
   }
 

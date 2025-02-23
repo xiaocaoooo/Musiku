@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 
+import '../const.dart';
+
 class Info extends StatefulWidget {
   const Info({super.key});
 
@@ -93,7 +95,12 @@ class _InfoState extends State<Info> {
     ];
 
     return Scaffold(
-      appBar: AppBar(title: const Text("About")),
+      appBar: AppBar(
+          title: Text(
+        Const.about,
+        style: TextStyle(
+            color: Theme.of(context).colorScheme.onSecondaryContainer),
+      )),
       body: SafeArea(
         child: ListView.builder(
           itemCount: _items.length,
