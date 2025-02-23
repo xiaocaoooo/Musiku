@@ -21,6 +21,7 @@ class _HomePageState extends State<HomePage> {
   String imagePath = '';
   String imageCopyright = '';
   String imageTitle = '';
+
   // PaletteGenerator? paletteGenerator;
   ThemeData? imageTheme;
 
@@ -53,8 +54,8 @@ class _HomePageState extends State<HomePage> {
       });
     }
     try {
-      final response = await http.get(Uri.parse(
-          'https://xiaocaoooo.github.io/musiku/announcement.json'));
+      final response = await http.get(
+          Uri.parse('https://xiaocaoooo.github.io/musiku/announcement.json'));
       if (response.statusCode == 200) {
         // 保存响应内容到本地文件
         file.writeAsString(response.body);
@@ -135,8 +136,7 @@ class _HomePageState extends State<HomePage> {
     // fetchColor();
     return Scaffold(
         // appBar: AppBar(title: const Text("Home")),
-        body: SafeArea(
-            child: Padding(
+        body: Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
         children: [
@@ -152,9 +152,7 @@ class _HomePageState extends State<HomePage> {
                     decoration: BoxDecoration(
                       color: imageTheme != null
                           ? imageTheme!.colorScheme.primaryContainer
-                          : Theme.of(context)
-                          .colorScheme
-                          .primaryContainer,
+                          : Theme.of(context).colorScheme.primaryContainer,
                       borderRadius:
                           const BorderRadius.all(Radius.circular(16.0)),
                     ),
@@ -178,7 +176,8 @@ class _HomePageState extends State<HomePage> {
                                     imageTitle,
                                     style: TextStyle(
                                         color: imageTheme != null
-                                            ? imageTheme!.colorScheme.onPrimaryContainer
+                                            ? imageTheme!
+                                                .colorScheme.onPrimaryContainer
                                             : Theme.of(context)
                                                 .colorScheme
                                                 .onPrimaryContainer),
@@ -188,10 +187,11 @@ class _HomePageState extends State<HomePage> {
                                     imageCopyright,
                                     style: TextStyle(
                                         color: (imageTheme != null
-                                            ? imageTheme!.colorScheme.onPrimaryContainer
-                                            : Theme.of(context)
-                                            .colorScheme
-                                            .onPrimaryContainer)
+                                                ? imageTheme!.colorScheme
+                                                    .onPrimaryContainer
+                                                : Theme.of(context)
+                                                    .colorScheme
+                                                    .onPrimaryContainer)
                                             .withOpacity(0.6),
                                         fontSize: 10.0),
                                   )
@@ -266,6 +266,6 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-    )));
+    ));
   }
 }

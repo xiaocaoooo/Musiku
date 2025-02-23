@@ -158,24 +158,22 @@ class _MusicListPageState extends State<MusicListPage> {
     //   );
     // }
     return Scaffold(
-      body: SafeArea(
-        child: ListView.builder(
-          itemCount: _musicList.length,
-          itemBuilder: (context, index) {
-            return ListTile(
-              title: MusicInfo(path: _musicList[index]),
-              onTap: () {
-                Global.playlist = _musicList;
-                Global.playingIndex = index;
-                Navigator.pushNamed(context, "/player",
-                    arguments: _musicList[index]);
-                setState(() {});
-                // Navigator.pushNamed(context, "/player",
-                //     arguments: _musicList[index]);
-              },
-            );
-          },
-        ),
+      body: ListView.builder(
+        itemCount: _musicList.length,
+        itemBuilder: (context, index) {
+          return ListTile(
+            title: MusicInfo(path: _musicList[index]),
+            onTap: () {
+              Global.playlist = _musicList;
+              Global.playingIndex = index;
+              Navigator.pushNamed(context, "/player",
+                  arguments: _musicList[index]);
+              setState(() {});
+              // Navigator.pushNamed(context, "/player",
+              //     arguments: _musicList[index]);
+            },
+          );
+        },
       ),
     );
   }

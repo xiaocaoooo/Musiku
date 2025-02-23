@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -123,7 +125,7 @@ class MyApp extends StatelessWidget {
           initialRoute: '/',
           // home: const BottomNavigationExample(),
           routes: {
-            '/': (context) => const BottomNavigationExample(),
+            '/': (context) => const App(),
             '/home': (context) => const HomePage(),
             '/more': (context) => const MorePage(),
             "/settings": (context) => const Settings(),
@@ -228,15 +230,14 @@ class MyApp extends StatelessWidget {
 // }
 }
 
-class BottomNavigationExample extends StatefulWidget {
-  const BottomNavigationExample({super.key});
+class App extends StatefulWidget {
+  const App({super.key});
 
   @override
-  State<BottomNavigationExample> createState() =>
-      _BottomNavigationExampleState();
+  State<App> createState() => _AppState();
 }
 
-class _BottomNavigationExampleState extends State<BottomNavigationExample> {
+class _AppState extends State<App> {
   // 当前选中的页面索引
   int _selectedIndex = 0;
 
@@ -280,11 +281,15 @@ class _BottomNavigationExampleState extends State<BottomNavigationExample> {
       systemNavigationBarIconBrightness: Brightness.light,
     ));
     return Scaffold(
+      extendBody: true,
+      // 让 body 延伸到 bottomNavigationBar 下方
+      // extendBodyBehindAppBar: true, // 让 body 延伸到 AppBar 下方
       appBar: AppBar(
         title: Text(Const.appName,
             style: TextStyle(
                 color: Theme.of(context).colorScheme.onSecondaryContainer,
                 fontWeight: FontWeight.bold)),
+        // backgroundColor: Colors.transparent,
       ),
       body: PageView(
         controller: _pageController,
@@ -303,40 +308,48 @@ class _BottomNavigationExampleState extends State<BottomNavigationExample> {
               child: const Icon(Icons.music_note),
             )
           : null,
-      bottomNavigationBar: NavigationBar(
-        // 当前选中的索引
-        selectedIndex: _selectedIndex,
-        // 点击事件处理
-        onDestinationSelected: (index) {
-          _pageController.animateToPage(
-            index,
-            duration: const Duration(milliseconds: 300), // 动画持续时间
-            curve: Curves.easeInOut, // 动画曲线
-          );
-        },
-        // 底部导航栏的目的地（即每个导航项）
-        destinations: <Widget>[
-          NavigationDestination(
-            icon: const Icon(Icons.home),
-            label: Const.home,
+      bottomNavigationBar: ClipRRect(
+        child:BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: NavigationBar(
+            // backgroundColor: Colors.transparent,
+            // elevation: 0,
+            backgroundColor: Theme.of(context).colorScheme.surface.withOpacity(0.5),
+            // 当前选中的索引
+            selectedIndex: _selectedIndex,
+            // 点击事件处理
+            onDestinationSelected: (index) {
+              _pageController.animateToPage(
+                index,
+                duration: const Duration(milliseconds: 300), // 动画持续时间
+                curve: Curves.easeInOut, // 动画曲线
+              );
+            },
+            // 底部导航栏的目的地（即每个导航项）
+            destinations: <Widget>[
+              NavigationDestination(
+                icon: const Icon(Icons.home),
+                label: Const.home,
+              ),
+              NavigationDestination(
+                icon: const Icon(Icons.search),
+                label: Const.search,
+              ),
+              NavigationDestination(
+                icon: const Icon(Icons.library_music),
+                label: Const.music,
+              ),
+              // NavigationDestination(
+              //   icon: const Icon(Icons.playlist_play),
+              //   label: Const.playlist,
+              // ),
+              NavigationDestination(
+                icon: const Icon(Icons.settings),
+                label: Const.more,
+              ),
+            ],
           ),
-          NavigationDestination(
-            icon: const Icon(Icons.search),
-            label: Const.search,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.library_music),
-            label: Const.music,
-          ),
-          // NavigationDestination(
-          //   icon: const Icon(Icons.playlist_play),
-          //   label: Const.playlist,
-          // ),
-          NavigationDestination(
-            icon: const Icon(Icons.settings),
-            label: Const.more,
-          ),
-        ],
+        )
       ),
     );
   }

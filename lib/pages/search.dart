@@ -10,6 +10,7 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   String query = '';
+
   // List<String> results = ["123", "456"];
 
   // void search() async {
@@ -26,26 +27,24 @@ class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            TextField(
-              decoration: const InputDecoration(
-                hintText: 'Search',
-                prefixIcon: Icon(Icons.search),
-              ),
-              onChanged: (value) {
-                setState(() {
-                  query = value;
-                });
-                // search();
-              },
+      body: Column(
+        children: [
+          TextField(
+            decoration: const InputDecoration(
+              hintText: 'Search',
+              prefixIcon: Icon(Icons.search),
             ),
-            Expanded(
-              child: SearchResult(query: query),
-            )
-          ],
-        ),
+            onChanged: (value) {
+              setState(() {
+                query = value;
+              });
+              // search();
+            },
+          ),
+          Expanded(
+            child: SearchResult(query: query),
+          )
+        ],
       ),
     );
   }
