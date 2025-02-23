@@ -20,15 +20,20 @@ class Lyrics {
   String by = "";
   int type = LyricType.txt;
   List<Lrc> lrcs = [];
+  static RegExp regExpEsLyric = RegExp(r"<\d{2}:\d{2}\.\d{2}>");
+  static RegExp regExpEsLyric2 = RegExp(r"<\d{2}:\d{2}\.\d{2}>.+");
+  static RegExp regExpEsLyric3 = RegExp(r"<\d{2}:\d{2}\.\d{2}>[^<]*");
+  static RegExp regExpLrc = RegExp(r"\[\d{2}:\d{2}\.\d{2}\]");
+  bool inited = false;
 
   // 构造函数，初始化歌词和按行拆分后的歌词列表
   Lyrics(this.lyrics) {
     lines = lyrics.split('\n');
     lines = lines.where((line) => line.isNotEmpty).toList();
 
-    if (RegExp(r"<\d{2}:\d{2}\.\d{2}>").hasMatch(lyrics)) {
+    if (regExpEsLyric.hasMatch(lyrics)) {
       type = LyricType.eslyric;
-    } else if (RegExp(r"\[\d{2}:\d{2}\.\d{2}\]").hasMatch(lyrics)) {
+    } else if (regExpLrc.hasMatch(lyrics)) {
       type = LyricType.lrc;
     }
 
@@ -67,7 +72,7 @@ class Lyrics {
           String text = lines[i].substring(lines[i].indexOf("]") + 1);
           lrcs.add(LyricLine(text, startTime, endTime));
         } else if (type == LyricType.eslyric) {
-          if (RegExp(r"<\d{2}:\d{2}\.\d{2}>.+").hasMatch(lines[i])) {
+          if (regExpEsLyric2.hasMatch(lines[i])) {
             double startTime =
                 processTime(lines[i].substring(1, lines[i].indexOf("]")));
             double endTime = -1;
@@ -76,11 +81,9 @@ class Lyrics {
               endTime = processTime(
                   lines[i + 1].substring(1, lines[i + 1].indexOf("]")));
             }
-            endTime = processTime("${lines[i].split("<").last}");
+            endTime = processTime(lines[i].split("<").last);
             List<LyricWord> words = [];
-            List<Match> matches = RegExp(r"<\d{2}:\d{2}\.\d{2}>[^<]*")
-                .allMatches(lines[i])
-                .toList();
+            List<Match> matches = regExpEsLyric3.allMatches(lines[i]).toList();
             for (var i = 0; i < matches.length; i++) {
               Match match = matches[i];
               double wordStartTime = processTime(
@@ -117,6 +120,7 @@ class Lyrics {
         }
       }
     }
+    inited = true;
   }
 
   double processTime(String time) {
@@ -263,16 +267,22 @@ class _LyricState extends State<Lyric> {
             List<Widget> children = [];
             for (var i = 0; i < widget.lrc.words.length; i++) {
               if (widget.time > widget.lrc.words[i].endTime) {
-                children.add(Text(
-                    widget.lrc.words[i].text +
-                        widget.lrc.words[i].endTime.toString(),
-                    style: textStyle.copyWith(color: Colors.red)));
+                children.add(Text(widget.lrc.words[i].text,
+                    style: textStyle.copyWith(color: primaryColor)));
               } else if (widget.time < widget.lrc.words[i].startTime) {
                 children.add(Text(widget.lrc.words[i].text,
                     style: textStyle.copyWith(color: secondaryColor)));
               } else {
-                children.add(Text(widget.lrc.words[i].text,
-                    style: textStyle.copyWith(color: Colors.green)));
+                children.add(GradientText(
+                  text: widget.lrc.words[i].text,
+                  style: textStyle,
+                  gradient: LinearGradient(
+                    colors: [primaryColor, secondaryColor],
+                    stops: [progress, progress],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
+                ));
                 // final wordProgress =
                 //     (widget.time - widget.lrc.words[i].startTime) /
                 //         (widget.lrc.words[i].endTime -
@@ -288,7 +298,7 @@ class _LyricState extends State<Lyric> {
                 //     )));
               }
             }
-            children.add(Text(progress.toString()));
+            // children.add(Text(progress.toString()));
             return Wrap(direction: Axis.horizontal, children: children);
           }),
         ),

@@ -20,7 +20,8 @@ class LyricPage extends StatefulWidget {
   State<LyricPage> createState() => _LyricPageState();
 }
 
-class _LyricPageState extends State<LyricPage> {
+class _LyricPageState extends State<LyricPage>
+    with SingleTickerProviderStateMixin {
   String path = "";
   String cover = "";
   String title = "";
@@ -31,7 +32,7 @@ class _LyricPageState extends State<LyricPage> {
   double position = 0;
   int idx = 0;
   int lastIdx = 0;
-  late Lyrics lyrics;
+  Lyrics? lyrics;
   List<dynamic> lrcs = [];
   List<dynamic> widgets = [];
   Color primaryColor = const Color(0xFF39C5BB);
@@ -39,6 +40,7 @@ class _LyricPageState extends State<LyricPage> {
       PaletteGenerator.fromColors([PaletteColor(const Color(0xFF39C5BB), 1)]);
   late ScrollController _scrollController;
   bool exist = true;
+  late AnimationController _controller;
 
   Future<void> initData() async {
     getMusicMetadata(path, cache: false);
@@ -57,6 +59,7 @@ class _LyricPageState extends State<LyricPage> {
   }
 
   Future<void> refresh({bool auto = false}) async {
+    // print("refresh");
     if (auto && mounted) {
       Future.delayed(const Duration(milliseconds: 50), () {
         refresh(auto: true);
@@ -67,53 +70,60 @@ class _LyricPageState extends State<LyricPage> {
       initData();
     }
     if (mounted) {
-      setState(() {
-        position = Global.player.player.position.inSeconds.toDouble();
-        duration =
-            Global.player.player.duration?.inSeconds.toDouble() ?? duration;
-        if (lyric != "") {
-          widgets = [
-            const SizedBox(
-              height: 200,
-            )
-          ];
-          lrcs = lyrics.lrcs;
-          for (int i = 0; i < lrcs.length; i++) {
-            if (lrcs[i].startTime <= position && position <= lrcs[i].endTime) {
-              idx = i;
-            }
-            widgets.add(Lyric(
-              lrcs[i],
-              position,
-            ));
-          }
-          if (lastIdx != idx) {
-            print("idx:$idx");
-            lastIdx = idx;
-            _scrollController.animateTo(
-              (48 * idx).toDouble(),
-              duration: const Duration(milliseconds: 500),
-              curve: Curves.easeInOut,
-            );
-          }
-          // print("idx:$idx");
-          // double progress = (position - widgets[idx].lrc.startTime) /
-          //     (widgets[idx].lrc.endTime - widgets[idx].lrc.startTime);
-          // widgets = [
-          //   // ClipRRect(
-          //   //     clipBehavior: Clip.hardEdge,
-          //   //     child: Container(height: max(48 * min(1-progress, 1), 0), child: widgets[idx - 5])),
-          //   ...widgets.sublist(max(idx - 5, 0))
-          // ];
-        }
-      });
+      position = Global.player.player.position.inSeconds.toDouble();
+      duration =
+          Global.player.player.duration?.inSeconds.toDouble() ?? duration;
+      // if (lyric != "") {
+      //   widgets = [
+      //     const SizedBox(
+      //       height: 200,
+      //     )
+      //   ];
+      //   lrcs = lyrics.lrcs;
+      //   for (int i = 0; i < lrcs.length; i++) {
+      //     if (lrcs[i].startTime <= position && position <= lrcs[i].endTime) {
+      //       idx = i;
+      //     }
+      //     widgets.add(Lyric(
+      //       lrcs[i],
+      //       position,
+      //     ));
+      //   }
+      //   if (lastIdx != idx) {
+      //     print("idx:$idx");
+      //     lastIdx = idx;
+      //     _scrollController.animateTo(
+      //       (48 * idx).toDouble(),
+      //       duration: const Duration(milliseconds: 500),
+      //       curve: Curves.easeInOut,
+      //     );
+      //   }
+      //   // print("idx:$idx");
+      //   // double progress = (position - widgets[idx].lrc.startTime) /
+      //   //     (widgets[idx].lrc.endTime - widgets[idx].lrc.startTime);
+      //   // widgets = [
+      //   //   // ClipRRect(
+      //   //   //     clipBehavior: Clip.hardEdge,
+      //   //   //     child: Container(height: max(48 * min(1-progress, 1), 0), child: widgets[idx - 5])),
+      //   //   ...widgets.sublist(max(idx - 5, 0))
+      //   // ];
+      // }
+      setState(() {});
     }
   }
 
-  void _init() {
+  Future<void> _init() async {
     _scrollController = ScrollController();
     path = Global.playlist[Global.playingIndex];
-    initData();
+    await initData();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    );
+    _controller.addListener(() {
+      refresh();
+    });
+    _controller.repeat();
     // refresh(auto: true);
     // Timer.periodic(const Duration(milliseconds: 0), (timer) {
     //   refresh(auto: true);
@@ -123,9 +133,9 @@ class _LyricPageState extends State<LyricPage> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration(seconds: 3), () {
-      refresh();
-    });
+    // Future.delayed(Duration(seconds: 3), () {
+    //   refresh();
+    // });
     // refresh(auto: true);
     // WidgetsBinding.instance.addPersistentFrameCallback((_) {
     //   refresh();
@@ -136,6 +146,7 @@ class _LyricPageState extends State<LyricPage> {
   @override
   void dispose() {
     super.dispose();
+    _controller.dispose();
     // Timer.periodic(const Duration(milliseconds: 50), (timer) {
     //   refresh(auto: true);
     // }).cancel();
@@ -144,6 +155,7 @@ class _LyricPageState extends State<LyricPage> {
 
   @override
   Widget build(BuildContext context) {
+    // print("123index length ${lyrics.lrcs.length}");
     return Scaffold(
       body: Stack(children: [
         cover != ""
@@ -169,15 +181,20 @@ class _LyricPageState extends State<LyricPage> {
               //       .padding
               //       .top,
               // ),
-              Expanded(
-                  child: ListView.builder(
-                // physics: const NeverScrollableScrollPhysics(),
-                // controller: _scrollController,
-                itemCount: widgets.length,
-                itemBuilder: (context, index) {
-                  return widgets[index];
-                },
-              )),
+              lyrics!.inited
+                  ? Expanded(
+                      child: ListView.builder(
+                        itemCount: lyrics!.lrcs.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          // print("123index:$index");
+                          return Lyric(
+                            lyrics!.lrcs[index],
+                            position,
+                          );
+                        },
+                      ),
+                    )
+                  : Container(),
             ],
           ),
         ),
