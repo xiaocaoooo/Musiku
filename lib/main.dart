@@ -52,9 +52,12 @@ Future<void> checkAndRequestAudioPermission() async {
   }
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
-
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+class _MyAppState extends State<MyApp> {
   // Future<void> setTheme(BuildContext context) async {
   //   int primaryColorValue = await UserSettings.getPrimaryColor();
   //   Color primaryColor = Color(primaryColorValue);
@@ -109,55 +112,56 @@ class MyApp extends StatelessWidget {
     //     "/lyric": (context) => LyricPage(),
     //   },
     // );
-    return DynamicColorBuilder(
-      builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
-        return MaterialApp(
-          // theme: ThemeData(
-          //   colorScheme: ColorScheme.fromSeed(
-          //     // seedColor: Theme.of(context).colorScheme.primary,
-          //       seedColor: Color(0xFF39C5BB),
-          //       brightness: MediaQuery.of(context).platformBrightness),
-          //   useMaterial3: true,
-          // ),
-          theme: buildTheme(lightDynamic, false),
-          darkTheme: buildTheme(darkDynamic, true),
-          // theme: Global.themeData,
-          initialRoute: '/',
-          // home: const BottomNavigationExample(),
-          routes: {
-            '/': (context) => const App(),
-            '/home': (context) => const HomePage(),
-            '/more': (context) => const MorePage(),
-            "/settings": (context) => const Settings(),
-            "/info": (context) => const Info(),
-            "/debug": (context) => const Debug(),
-            "/settings/folders": (context) => const FoldersSettings(),
-            "/music": (context) => const MusicPage(),
-            "/playlist": (context) => const PlaylistPage(),
-            "/search": (context) => const SearchPage(),
-            "/music_list": (context) {
-              // 从路由参数中获取 path 参数
-              final String path =
-                  ModalRoute.of(context)?.settings.arguments as String;
-              return MusicListPage(path: path);
+     return DynamicColorBuilder(
+        builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
+          print("primary${(Global.darkThemeData??ThemeData(colorScheme: darkDynamic, useMaterial3: true)).colorScheme.primary}");
+          return MaterialApp(
+            // theme: ThemeData(
+            //   colorScheme: ColorScheme.fromSeed(
+            //     // seedColor: Theme.of(context).colorScheme.primary,
+            //       seedColor: Color(0xFF39C5BB),
+            //       brightness: MediaQuery.of(context).platformBrightness),
+            //   useMaterial3: true,
+            // ),
+            theme: Global.lightThemeData??ThemeData(colorScheme: lightDynamic, useMaterial3: true),
+            darkTheme: Global.darkThemeData??ThemeData(colorScheme: darkDynamic, useMaterial3: true),
+            // theme: Global.themeData,
+            initialRoute: '/',
+            // home: const BottomNavigationExample(),
+            routes: {
+              '/': (context) => const App(),
+              '/home': (context) => const HomePage(),
+              '/more': (context) => const MorePage(),
+              "/settings": (context) => const Settings(),
+              "/info": (context) => const Info(),
+              "/debug": (context) => const Debug(),
+              "/settings/folders": (context) => const FoldersSettings(),
+              "/music": (context) => const MusicPage(),
+              "/playlist": (context) => const PlaylistPage(),
+              "/search": (context) => const SearchPage(),
+              "/music_list": (context) {
+                // 从路由参数中获取 path 参数
+                final String path =
+                ModalRoute.of(context)?.settings.arguments as String;
+                return MusicListPage(path: path);
+              },
+              "/text_page": (context) {
+                final String text =
+                ModalRoute.of(context)?.settings.arguments as String;
+                return TextPage(text: text);
+              },
+              "/player": (context) {
+                final String? path =
+                ModalRoute.of(context)?.settings.arguments as String?;
+                return PlayerPage(path: path);
+              },
+              // "/player": (context) => const PlayerPage(),
+              "/lyric": (context) => LyricPage(),
+              "/index": (context) => const IndexPage(),
             },
-            "/text_page": (context) {
-              final String text =
-                  ModalRoute.of(context)?.settings.arguments as String;
-              return TextPage(text: text);
-            },
-            "/player": (context) {
-              final String? path =
-                  ModalRoute.of(context)?.settings.arguments as String?;
-              return PlayerPage(path: path);
-            },
-            // "/player": (context) => const PlayerPage(),
-            "/lyric": (context) => LyricPage(),
-            "/index": (context) => const IndexPage(),
-          },
-        );
-      },
-    );
+          );
+        },
+      );
   }
 
   ThemeData buildTheme(ColorScheme? dynamicScheme, bool isDarkMode) {
@@ -168,6 +172,7 @@ class MyApp extends StatelessWidget {
       useMaterial3: true,
     );
   }
+}
 
 // @override
 // Widget build(BuildContext context) {
@@ -228,7 +233,7 @@ class MyApp extends StatelessWidget {
 //     },
 //   );
 // }
-}
+// }
 
 class App extends StatefulWidget {
   const App({super.key});

@@ -1,17 +1,19 @@
 import 'dart:async';
-import 'dart:ffi';
 import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
+import 'package:mmoo_lyric/lyric.dart';
+import 'package:mmoo_lyric/lyric_controller.dart';
+import 'package:mmoo_lyric/lyric_util.dart';
+import 'package:mmoo_lyric/lyric_widget.dart';
 import 'package:musiku/auto_scrolling_text.dart';
 import 'package:musiku/global.dart';
 import 'package:musiku/utool.dart';
 import 'package:musiku/usersettings.dart';
 import 'package:palette_generator/palette_generator.dart';
-
-import '../lyric.dart';
+// import '../lyric.dart';
 
 class LyricPage extends StatefulWidget {
   LyricPage({super.key});
@@ -32,15 +34,14 @@ class _LyricPageState extends State<LyricPage>
   double position = 0;
   int idx = 0;
   int lastIdx = 0;
-  Lyrics? lyrics;
-  List<dynamic> lrcs = [];
-  List<dynamic> widgets = [];
   Color primaryColor = const Color(0xFF39C5BB);
   PaletteGenerator paletteGenerator =
       PaletteGenerator.fromColors([PaletteColor(const Color(0xFF39C5BB), 1)]);
-  late ScrollController _scrollController;
   bool exist = true;
   late AnimationController _controller;
+  late LyricController controller;
+  late List<Lyric> lyrics;
+  final regExp = RegExp(r"<\d+:\d+\.\d+>");
 
   Future<void> initData() async {
     getMusicMetadata(path, cache: false);
@@ -50,9 +51,9 @@ class _LyricPageState extends State<LyricPage>
     artist = meta?["artist"] ?? "";
     album = meta?["album"] ?? "";
     duration = meta?["duration"].toDouble() ?? 0;
+    lyrics =
+        LyricUtil.formatLyric((await getLyrics(path)).replaceAll(regExp, ""));
     setState(() {});
-    lyric = await getLyrics(path);
-    lyrics = Lyrics(lyric);
     paletteGenerator = (await getPaletteGeneratorFromImage(cover))!;
     primaryColor = paletteGenerator.dominantColor!.color;
     setState(() {});
@@ -70,9 +71,12 @@ class _LyricPageState extends State<LyricPage>
       initData();
     }
     if (mounted) {
-      position = Global.player.player.position.inSeconds.toDouble();
-      duration =
-          Global.player.player.duration?.inSeconds.toDouble() ?? duration;
+      setState(() {
+        position = Global.player.player.position.inSeconds.toDouble();
+        duration =
+            Global.player.player.duration?.inSeconds.toDouble() ?? duration;
+        controller.progress = Global.player.player.duration!;
+      });
       // if (lyric != "") {
       //   widgets = [
       //     const SizedBox(
@@ -108,14 +112,15 @@ class _LyricPageState extends State<LyricPage>
       //   //   ...widgets.sublist(max(idx - 5, 0))
       //   // ];
       // }
-      setState(() {});
     }
   }
 
   Future<void> _init() async {
-    _scrollController = ScrollController();
+    // _scrollController = ScrollController();
+    controller = LyricController(vsync: this);
     path = Global.playlist[Global.playingIndex];
     await initData();
+    // refresh();
     _controller = AnimationController(
       duration: const Duration(seconds: 2),
       vsync: this,
@@ -181,20 +186,16 @@ class _LyricPageState extends State<LyricPage>
               //       .padding
               //       .top,
               // ),
-              lyrics!.inited
-                  ? Expanded(
-                      child: ListView.builder(
-                        itemCount: lyrics!.lrcs.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          // print("123index:$index");
-                          return Lyric(
-                            lyrics!.lrcs[index],
-                            position,
-                          );
-                        },
-                      ),
-                    )
-                  : Container(),
+              SizedBox(
+                height: 200,
+              ),
+              Expanded(
+                  // child: LyricsView(lrcs: lyrics??[], time: position),
+                  child: LyricWidget(
+                size: Size.infinite,
+                lyrics: lyrics,
+                controller: controller,
+              ))
             ],
           ),
         ),

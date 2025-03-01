@@ -1,7 +1,10 @@
+import 'package:flutter/material.dart';
 import 'package:musiku/player.dart';
 
 class Global {
+  static bool firstRun = true;
   static Player player = Player();
+
   // static FlutterRadioPlayer player = FlutterRadioPlayer();
   // static ThemeData themeData = ThemeData();
   //   colorScheme: ColorScheme.fromSeed(
@@ -9,6 +12,18 @@ class Global {
   //       brightness: MediaQuery.of(context).platformBrightness),
   //   useMaterial3: true,
   // );
+  // static ThemeData lightThemeData = ThemeData(
+  //     colorScheme: ColorScheme.fromSeed(
+  //         seedColor: Color(0xff39c5bb), brightness: Brightness.light),
+  //     brightness: Brightness.light,
+  //     useMaterial3: true);
+  // static ThemeData darkThemeData = ThemeData(
+  //     colorScheme: ColorScheme.fromSeed(
+  //         seedColor: Color(0xff39c5bb), brightness: Brightness.dark),
+  //     brightness: Brightness.dark,
+  //     useMaterial3: true);
+  static ThemeData? lightThemeData;
+  static ThemeData? darkThemeData;
   static Map<String, dynamic> musicInfo = {};
   static Map<String, int> musicLastModified = {};
   static List<String> playlist = [];

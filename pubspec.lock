@@ -312,6 +312,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.9.1"
+  mmoo_lyric:
+    dependency: "direct main"
+    description:
+      name: mmoo_lyric
+      sha256: b4c3d05509632d20b957b92b2e266591b7a0045f5c6b22720326d88a188184be
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "1.0.0"
   palette_generator:
     dependency: "direct main"
     description:

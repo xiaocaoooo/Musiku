@@ -49,6 +49,18 @@ class _PlayerPageState extends State<PlayerPage> with TickerProviderStateMixin {
     duration = meta?["duration"].toDouble() ?? 0;
     paletteGenerator = (await getPaletteGeneratorFromImage(cover))!;
     primaryColor = paletteGenerator.dominantColor!.color;
+    Global.lightThemeData = ThemeData(
+      colorScheme: ColorScheme.fromSeed(
+          seedColor: primaryColor, brightness: Brightness.light),
+      brightness: Brightness.light,
+      useMaterial3: true,
+    );
+    Global.darkThemeData = ThemeData(
+      colorScheme: ColorScheme.fromSeed(
+          seedColor: primaryColor, brightness: Brightness.dark),
+      brightness: Brightness.dark,
+      useMaterial3: true,
+    );
     setState(() {});
   }
 
@@ -60,8 +72,9 @@ class _PlayerPageState extends State<PlayerPage> with TickerProviderStateMixin {
     position = Global.player.player.position.inSeconds.toDouble();
     duration = Global.player.player.duration?.inSeconds.toDouble() ?? duration;
     setState(() {});
-    if (auto&&mounted) {
-      Future.delayed(const Duration(milliseconds: 500), () => refresh(auto: true));
+    if (auto && mounted) {
+      Future.delayed(
+          const Duration(milliseconds: 500), () => refresh(auto: true));
     }
   }
 
@@ -127,8 +140,8 @@ class _PlayerPageState extends State<PlayerPage> with TickerProviderStateMixin {
   }
 
   void _handleVerticalDragUpdate(DragUpdateDetails details) {
-      _slideController.value +=
-          details.primaryDelta! / MediaQuery.of(context).size.height;
+    _slideController.value +=
+        details.primaryDelta! / MediaQuery.of(context).size.height;
   }
 
   void _handleVerticalDragEnd(DragEndDetails details) {
@@ -287,7 +300,7 @@ class _PlayerPageState extends State<PlayerPage> with TickerProviderStateMixin {
                                       child: Slider(
                                         value: position,
                                         min: 0,
-                                        max: duration+1,
+                                        max: duration + 1,
                                         activeColor: paletteGenerator
                                                     .lightVibrantColor !=
                                                 null
@@ -348,7 +361,7 @@ class _PlayerPageState extends State<PlayerPage> with TickerProviderStateMixin {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               IconButton(
-                                icon: Icon(Ionicons.play_skip_back,
+                                icon: Icon(Ionicons.play_back,
                                     color: Colors.white.withOpacity(0.6),
                                     size: 48),
                                 onPressed: () {
@@ -385,7 +398,7 @@ class _PlayerPageState extends State<PlayerPage> with TickerProviderStateMixin {
                               ),
                               const SizedBox(width: 16),
                               IconButton(
-                                icon: Icon(Ionicons.play_skip_forward,
+                                icon: Icon(Ionicons.play_forward,
                                     color: Colors.white.withOpacity(0.6),
                                     size: 48),
                                 onPressed: () {

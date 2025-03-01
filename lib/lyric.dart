@@ -19,7 +19,7 @@ class Lyrics {
   String offset = "";
   String by = "";
   int type = LyricType.txt;
-  List<Lrc> lrcs = [];
+  List<Map<String, dynamic>> lrcs = [];
   static RegExp regExpEsLyric = RegExp(r"<\d{2}:\d{2}\.\d{2}>");
   static RegExp regExpEsLyric2 = RegExp(r"<\d{2}:\d{2}\.\d{2}>.+");
   static RegExp regExpEsLyric3 = RegExp(r"<\d{2}:\d{2}\.\d{2}>[^<]*");
@@ -70,7 +70,18 @@ class Lyrics {
                 lines[i + 1].substring(1, lines[i + 1].indexOf("]")));
           }
           String text = lines[i].substring(lines[i].indexOf("]") + 1);
-          lrcs.add(LyricLine(text, startTime, endTime));
+          // lrcs.add(LyricLine(text, startTime, endTime));
+          lrcs.add({
+            "startTime": startTime,
+            "endTime": endTime,
+            "content": [
+              {
+                "startTime": startTime,
+                "endTime": endTime,
+                "text": text,
+              }
+            ],
+          });
         } else if (type == LyricType.eslyric) {
           if (regExpEsLyric2.hasMatch(lines[i])) {
             double startTime =
@@ -82,7 +93,7 @@ class Lyrics {
                   lines[i + 1].substring(1, lines[i + 1].indexOf("]")));
             }
             endTime = processTime(lines[i].split("<").last);
-            List<LyricWord> words = [];
+            List<Map<String, dynamic>> words = [];
             List<Match> matches = regExpEsLyric3.allMatches(lines[i]).toList();
             for (var i = 0; i < matches.length; i++) {
               Match match = matches[i];
@@ -91,18 +102,35 @@ class Lyrics {
               String wordText =
                   match.group(0)!.substring(match.group(0)!.indexOf(">") + 1);
               if (i < matches.length - 1) {
-                words.add(LyricWord(
-                    wordText,
-                    wordStartTime,
-                    processTime(matches[i + 1]
-                        .group(0)!
-                        .substring(1, matches[i + 1].group(0)!.indexOf(">")))));
+                // words.add(LyricWord(
+                //     wordText,
+                //     wordStartTime,
+                //     processTime(matches[i + 1]
+                //         .group(0)!
+                //         .substring(1, matches[i + 1].group(0)!.indexOf(">")))));
+                words.add({
+                  "startTime": wordStartTime,
+                  "endTime": processTime(matches[i + 1]
+                      .group(0)!
+                      .substring(1, matches[i + 1].group(0)!.indexOf(">"))),
+                  "text": wordText,
+                });
               } else {
-                words.add(LyricWord(wordText, wordStartTime, endTime));
+                // words.add(LyricWord(wordText, wordStartTime, endTime));
+                words.add({
+                  "startTime": wordStartTime,
+                  "endTime": endTime,
+                  "text": wordText,
+                });
               }
             }
             // endTime=words.last.endTime;
-            lrcs.add(LyricESLyric(startTime, endTime, words));
+            // lrcs.add(LyricESLyric(startTime, endTime, words));
+            lrcs.add({
+              "startTime": startTime,
+              "endTime": endTime,
+              "content": words,
+            });
           } else {
             double startTime =
                 processTime(lines[i].substring(1, lines[i].indexOf("]")));
@@ -114,8 +142,19 @@ class Lyrics {
             }
             String text = lines[i]
                 .substring(lines[i].indexOf("]") + 1, lines[i].indexOf("<"));
-            List<LyricWord> words = [LyricWord(text, startTime, -1)];
-            lrcs.add(LyricESLyric(startTime, endTime, words));
+            // List<LyricWord> words = [LyricWord(text, startTime, -1)];
+            // lrcs.add(LyricESLyric(startTime, endTime, words));
+            lrcs.add({
+              "startTime": startTime,
+              "endTime": endTime,
+              "content": [
+                {
+                  "startTime": startTime,
+                  "endTime": endTime,
+                  "text": text,
+                }
+              ],
+            });
           }
         }
       }
@@ -137,176 +176,130 @@ class Lyrics {
   }
 }
 
-class Lrc {}
-
-class LyricLine extends Lrc {
-  String text;
-  double startTime;
-  double endTime;
-
-  LyricLine(this.text, this.startTime, this.endTime);
-}
-
-class LyricESLyric extends Lrc {
-  double startTime;
-  double endTime;
-  List<LyricWord> words;
-
-  LyricESLyric(this.startTime, this.endTime, this.words);
-}
-
-class LyricWord {
-  String text;
-  double startTime;
-  double endTime;
-
-  LyricWord(this.text, this.startTime, this.endTime);
-}
-
-class Lyric extends StatefulWidget {
-  dynamic lrc;
+class LyricsView extends StatefulWidget {
+  List<Map<String, dynamic>> lrcs;
   double time;
 
-  Lyric(this.lrc, this.time);
+  LyricsView({super.key, required this.lrcs, required this.time});
 
   @override
-  State<Lyric> createState() => _LyricState();
+  State<LyricsView> createState() => _LyricsViewState();
 }
 
-class _LyricState extends State<Lyric> {
+class _LyricsViewState extends State<LyricsView> {
   @override
   Widget build(BuildContext context) {
-    final secondaryColor = Colors.white.withOpacity(0.4);
-    final primaryColor = Colors.white.withOpacity(0.8);
+    // final secondaryColor = Colors.white.withOpacity(0.4);
+    // final primaryColor = Colors.white.withOpacity(0.8);
+    final secondaryColor = Colors.green;
+    final primaryColor = Colors.red;
     const textStyle = TextStyle(
       fontSize: 22,
       fontWeight: FontWeight.bold,
     );
     const padding = EdgeInsets.symmetric(vertical: 8.0, horizontal: 28.0);
 
-    if (widget.lrc.endTime != -1 && widget.time > widget.lrc.endTime) {
-      if (widget.lrc is LyricLine) {
-        return Padding(
-          padding: padding,
-          child: Container(
-            child: Text(widget.lrc.text,
-                style: textStyle.copyWith(color: primaryColor)),
-          ),
-        );
-      } else if (widget.lrc is LyricESLyric) {
-        return Padding(
-          padding: padding,
-          child: Container(
-            child: Text(widget.lrc.words.map((word) => word.text).join(),
-                style: textStyle.copyWith(color: primaryColor)),
-          ),
-        );
+    String previousLyrics = "";
+    Map<String, dynamic> lastLyric = {};
+    Map<String, dynamic> currentLyric = {};
+    Map<String, dynamic> nextLyric = {};
+    String laterLyrics = "";
+
+    print(widget.lrcs.length);
+    for (var i = 0; i < widget.lrcs.length; i++) {
+      if (widget.lrcs[i]["endTime"] <= widget.time) {
+        if (i == 0) {
+          lastLyric = widget.lrcs[i];
+          continue;
+        }
+        previousLyrics +=
+            "${previousLyrics == "" ? "" : "\n"}${lastLyric["content"].map((e) => e["text"]).join()}";
+        // for (var j = 0; j < lastLyric["content"].length; j++) {
+        //   previousLyrics += lastLyric["content"][j]["text"];
+        // }
+        lastLyric = widget.lrcs[i];
+        continue;
       }
-    } else if (widget.time < widget.lrc.startTime) {
-      if (widget.lrc is LyricLine) {
-        return Padding(
-          padding: padding,
-          child: Container(
-            child: Text(widget.lrc.text,
-                style: textStyle.copyWith(color: secondaryColor)),
-          ),
-        );
-      } else if (widget.lrc is LyricESLyric) {
-        return Padding(
-          padding: padding,
-          child: Container(
-            child: Text(
-              widget.lrc.words.map((word) => word.text).join(),
-              style: textStyle.copyWith(color: secondaryColor),
-            ),
-            // child: ListView.builder(
-            //   scrollDirection: Axis.horizontal,
-            //   // shrinkWrap: true,
-            //   // physics: NeverScrollableScrollPhysics(),
-            //   itemCount: widget.lrc.words.length,
-            //   itemBuilder: (context, index) {
-            //     final word = widget.lrc.words[index];
-            //     return Text(word.text,
-            //         style: textStyle.copyWith(color: secondaryColor));
-            //   },
-            // ),
-          ),
-        );
+      if (widget.lrcs[i]["startTime"] > widget.time) {
+        // laterLyrics += laterLyrics == "" ? "" : "\n";
+        // for (var j = 0; j < widget.lrcs[i]["content"].length; j++) {
+        //   laterLyrics += widget.lrcs[i]["content"][j]["text"];
+        // }
+        laterLyrics +=
+            "${laterLyrics == "" ? "" : "\n"}${widget.lrcs[i]["content"].map((e) => e["text"]).join()}";
+        continue;
+      }
+      currentLyric = widget.lrcs[i];
+      if (i < widget.lrcs.length - 1) {
+        nextLyric = widget.lrcs[i + 1];
       }
     }
-    final progress = (widget.time - widget.lrc.startTime) /
-        (widget.lrc.endTime - widget.lrc.startTime);
-    // final progress = (Global.player.player.duration!.inSeconds.toDouble() - widget.lrc.startTime) /
-    //     (widget.lrc.endTime - widget.lrc.startTime);
-    if (widget.lrc == null) {
-      return Padding(
-        padding: padding,
-        child: Container(),
-      );
-    } else if (widget.lrc is LyricLine) {
-      return Padding(
-        padding: padding,
-        child: Container(
-          child: GradientText(
-            text: widget.lrc.text,
-            style: textStyle,
-            gradient: LinearGradient(
-              colors: [primaryColor, secondaryColor],
-              stops: [progress, progress],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-            ),
-          ),
-        ),
-      );
-    } else if (widget.lrc is LyricESLyric) {
-      return Padding(
-        padding: padding,
-        child: Container(
-          child: Builder(builder: (context) {
-            List<Widget> children = [];
-            for (var i = 0; i < widget.lrc.words.length; i++) {
-              if (widget.time > widget.lrc.words[i].endTime) {
-                children.add(Text(widget.lrc.words[i].text,
-                    style: textStyle.copyWith(color: primaryColor)));
-              } else if (widget.time < widget.lrc.words[i].startTime) {
-                children.add(Text(widget.lrc.words[i].text,
-                    style: textStyle.copyWith(color: secondaryColor)));
-              } else {
-                children.add(GradientText(
-                  text: widget.lrc.words[i].text,
-                  style: textStyle,
-                  gradient: LinearGradient(
-                    colors: [primaryColor, secondaryColor],
-                    stops: [progress, progress],
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                  ),
-                ));
-                // final wordProgress =
-                //     (widget.time - widget.lrc.words[i].startTime) /
-                //         (widget.lrc.words[i].endTime -
-                //             widget.lrc.words[i].startTime);
-                // children.add(GradientText(
-                //     text: widget.lrc.words[i].text,
-                //     style: textStyle,
-                //     gradient: LinearGradient(
-                //       colors: [primaryColor, secondaryColor],
-                //       stops: [wordProgress, wordProgress],
-                //       begin: Alignment.centerLeft,
-                //       end: Alignment.centerRight,
-                //     )));
-              }
-            }
-            // children.add(Text(progress.toString()));
-            return Wrap(direction: Axis.horizontal, children: children);
-          }),
-        ),
-      );
+    double progress = 1.0;
+    try {
+      progress = (widget.time - currentLyric["startTime"]) /
+          (currentLyric["endTime"] - currentLyric["startTime"]);
+    } catch (e) {
+      //
     }
+    // String pre="";
+    // String crt="";
+    // String lat="";
+    // for (var i = 0; i < currentLyric["content"].length; i++) {
+    //   if(currentLyric["content"][i]["endTime"]<widget.time){
+    //     pre+=currentLyric["content"][i]["text"];
+    //     continue;
+    //   }
+    //   if(currentLyric["content"][i]["startTime"]>widget.time){
+    //     lat+=currentLyric["content"][i]["text"];
+    //     continue;
+    //   }
+    //   crt=currentLyric["content"][i]["text"];
+    // }
     return Padding(
       padding: padding,
-      child: Container(),
+      child: SingleChildScrollView(
+          child: Column(children: [
+        SizedBox(
+            width: double.infinity,
+            child: Text(
+              previousLyrics,
+              style: textStyle.copyWith(color: primaryColor),
+              textAlign: TextAlign.start,
+            )),
+        // Wrap(children: [Text(pre, textAlign: TextAlign.start,),GradientText(
+        //     text: crt,
+        //     style: textStyle,
+        //     gradient: LinearGradient(
+        //       colors: [
+        //         primaryColor,
+        //         secondaryColor,
+        //       ],
+        //       stops: [progress, progress],
+        //       begin: Alignment.centerLeft,
+        //       end: Alignment.centerRight,
+        //     )
+        // ),Text(lat, textAlign: TextAlign.start,)],),
+        GradientText(
+          text: currentLyric["content"].map((e) => e["text"]).join(),
+          style: textStyle,
+          gradient: LinearGradient(
+            colors: [
+              primaryColor,
+              secondaryColor,
+            ],
+            stops: [progress, progress],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+          ),
+        ),
+        SizedBox(
+            width: double.infinity,
+            child: Text(
+              laterLyrics,
+              style: textStyle.copyWith(color: secondaryColor),
+              textAlign: TextAlign.start,
+            ))
+      ])),
     );
   }
 }
