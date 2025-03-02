@@ -101,4 +101,5 @@ flutter {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.multidex:multidex:2.0.1'
+    implementation 'com.github.xiaowine:Lyric-Getter-Api:6.0.0'
 }

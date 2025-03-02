@@ -1,3 +1,4 @@
+import 'dart:isolate';
 import 'dart:ui';
 
 import 'package:audio_service/audio_service.dart';
@@ -22,6 +23,7 @@ import 'package:musiku/pages/settings.dart';
 import 'package:musiku/pages/text_page.dart';
 import 'package:musiku/usersettings.dart';
 import 'package:dynamic_color/dynamic_color.dart';
+import 'background.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,6 +33,9 @@ Future<void> main() async {
 
   // 检查并请求 READ_MEDIA_AUDIO 权限
   checkAndRequestAudioPermission();
+
+  Global.isolate =
+      await Isolate.spawn(BackgroundTask, Global.receivePort.sendPort);
 
   runApp(const MyApp());
 }
@@ -54,9 +59,11 @@ Future<void> checkAndRequestAudioPermission() async {
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
   @override
   State<MyApp> createState() => _MyAppState();
 }
+
 class _MyAppState extends State<MyApp> {
   // Future<void> setTheme(BuildContext context) async {
   //   int primaryColorValue = await UserSettings.getPrimaryColor();
@@ -112,56 +119,56 @@ class _MyAppState extends State<MyApp> {
     //     "/lyric": (context) => LyricPage(),
     //   },
     // );
-     return DynamicColorBuilder(
-        builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
-          // print("primary${(Global.darkThemeData??ThemeData(colorScheme: darkDynamic, useMaterial3: true)).colorScheme.primary}");
-          return MaterialApp(
-            // theme: ThemeData(
-            //   colorScheme: ColorScheme.fromSeed(
-            //     // seedColor: Theme.of(context).colorScheme.primary,
-            //       seedColor: Color(0xFF39C5BB),
-            //       brightness: MediaQuery.of(context).platformBrightness),
-            //   useMaterial3: true,
-            // ),
-            theme: ThemeData(colorScheme: lightDynamic, useMaterial3: true),
-            darkTheme: ThemeData(colorScheme: darkDynamic, useMaterial3: true),
-            // theme: Global.themeData,
-            initialRoute: '/',
-            // home: const BottomNavigationExample(),
-            routes: {
-              '/': (context) => const App(),
-              '/home': (context) => const HomePage(),
-              '/more': (context) => const MorePage(),
-              "/settings": (context) => const Settings(),
-              "/info": (context) => const Info(),
-              "/debug": (context) => const Debug(),
-              "/settings/folders": (context) => const FoldersSettings(),
-              "/music": (context) => const MusicPage(),
-              "/playlist": (context) => const PlaylistPage(),
-              "/search": (context) => const SearchPage(),
-              "/music_list": (context) {
-                // 从路由参数中获取 path 参数
-                final String path =
-                ModalRoute.of(context)?.settings.arguments as String;
-                return MusicListPage(path: path);
-              },
-              "/text_page": (context) {
-                final String text =
-                ModalRoute.of(context)?.settings.arguments as String;
-                return TextPage(text: text);
-              },
-              "/player": (context) {
-                final String? path =
-                ModalRoute.of(context)?.settings.arguments as String?;
-                return PlayerPage(path: path);
-              },
-              // "/player": (context) => const PlayerPage(),
-              "/lyric": (context) => LyricPage(),
-              "/index": (context) => const IndexPage(),
+    return DynamicColorBuilder(
+      builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
+        // print("primary${(Global.darkThemeData??ThemeData(colorScheme: darkDynamic, useMaterial3: true)).colorScheme.primary}");
+        return MaterialApp(
+          // theme: ThemeData(
+          //   colorScheme: ColorScheme.fromSeed(
+          //     // seedColor: Theme.of(context).colorScheme.primary,
+          //       seedColor: Color(0xFF39C5BB),
+          //       brightness: MediaQuery.of(context).platformBrightness),
+          //   useMaterial3: true,
+          // ),
+          theme: ThemeData(colorScheme: lightDynamic, useMaterial3: true),
+          darkTheme: ThemeData(colorScheme: darkDynamic, useMaterial3: true),
+          // theme: Global.themeData,
+          initialRoute: '/',
+          // home: const BottomNavigationExample(),
+          routes: {
+            '/': (context) => const App(),
+            '/home': (context) => const HomePage(),
+            '/more': (context) => const MorePage(),
+            "/settings": (context) => const Settings(),
+            "/info": (context) => const Info(),
+            "/debug": (context) => const Debug(),
+            "/settings/folders": (context) => const FoldersSettings(),
+            "/music": (context) => const MusicPage(),
+            "/playlist": (context) => const PlaylistPage(),
+            "/search": (context) => const SearchPage(),
+            "/music_list": (context) {
+              // 从路由参数中获取 path 参数
+              final String path =
+                  ModalRoute.of(context)?.settings.arguments as String;
+              return MusicListPage(path: path);
             },
-          );
-        },
-      );
+            "/text_page": (context) {
+              final String text =
+                  ModalRoute.of(context)?.settings.arguments as String;
+              return TextPage(text: text);
+            },
+            "/player": (context) {
+              final String? path =
+                  ModalRoute.of(context)?.settings.arguments as String?;
+              return PlayerPage(path: path);
+            },
+            // "/player": (context) => const PlayerPage(),
+            "/lyric": (context) => LyricPage(),
+            "/index": (context) => const IndexPage(),
+          },
+        );
+      },
+    );
   }
 
   ThemeData buildTheme(ColorScheme? dynamicScheme, bool isDarkMode) {
@@ -314,48 +321,48 @@ class _AppState extends State<App> {
             )
           : null,
       bottomNavigationBar: ClipRRect(
-        child:BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-          child: NavigationBar(
-            // backgroundColor: Colors.transparent,
-            // elevation: 0,
-            backgroundColor: Theme.of(context).colorScheme.surface.withOpacity(0.5),
-            // 当前选中的索引
-            selectedIndex: _selectedIndex,
-            // 点击事件处理
-            onDestinationSelected: (index) {
-              _pageController.animateToPage(
-                index,
-                duration: const Duration(milliseconds: 300), // 动画持续时间
-                curve: Curves.easeInOut, // 动画曲线
-              );
-            },
-            // 底部导航栏的目的地（即每个导航项）
-            destinations: <Widget>[
-              NavigationDestination(
-                icon: const Icon(Icons.home),
-                label: Const.home,
-              ),
-              NavigationDestination(
-                icon: const Icon(Icons.search),
-                label: Const.search,
-              ),
-              NavigationDestination(
-                icon: const Icon(Icons.library_music),
-                label: Const.music,
-              ),
-              // NavigationDestination(
-              //   icon: const Icon(Icons.playlist_play),
-              //   label: Const.playlist,
-              // ),
-              NavigationDestination(
-                icon: const Icon(Icons.settings),
-                label: Const.more,
-              ),
-            ],
-          ),
-        )
-      ),
+          child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+        child: NavigationBar(
+          // backgroundColor: Colors.transparent,
+          // elevation: 0,
+          backgroundColor:
+              Theme.of(context).colorScheme.surface.withOpacity(0.5),
+          // 当前选中的索引
+          selectedIndex: _selectedIndex,
+          // 点击事件处理
+          onDestinationSelected: (index) {
+            _pageController.animateToPage(
+              index,
+              duration: const Duration(milliseconds: 300), // 动画持续时间
+              curve: Curves.easeInOut, // 动画曲线
+            );
+          },
+          // 底部导航栏的目的地（即每个导航项）
+          destinations: <Widget>[
+            NavigationDestination(
+              icon: const Icon(Icons.home),
+              label: Const.home,
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.search),
+              label: Const.search,
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.library_music),
+              label: Const.music,
+            ),
+            // NavigationDestination(
+            //   icon: const Icon(Icons.playlist_play),
+            //   label: Const.playlist,
+            // ),
+            NavigationDestination(
+              icon: const Icon(Icons.settings),
+              label: Const.more,
+            ),
+          ],
+        ),
+      )),
     );
   }
 

@@ -9,36 +9,27 @@ class Player extends BaseAudioHandler
   // mix in default seek callback implementations
 
   final player = AudioPlayer(); // e.g. just_audio
-
-  void initState() {
-    player.playbackEventStream.listen((event) {
-      print("playerevent:$event");
-      switch (event.processingState) {
-        //   播放结束
-        case ProcessingState.completed:
-          next();
-          break;
-        default:
-          break;
-      }
-    });
-  }
+  bool playing = false;
 
   // The most common callbacks:
   Future<void> play() async {
     await player.play();
+    playing = player.playing;
   }
 
   Future<void> pause() async {
     await player.pause();
+    playing = player.playing;
   }
 
   Future<void> stop() async {
     await player.stop();
+    playing = player.playing;
   }
 
   Future<void> seek(Duration position) async {
     await player.seek(position);
+    playing = player.playing;
   }
 
   Future<void> previous() async {
@@ -48,6 +39,7 @@ class Player extends BaseAudioHandler
     }
     await player.setUrl(Global.playlist[Global.playingIndex]);
     await player.play();
+    playing = player.playing;
   }
 
   Future<void> next() async {
@@ -57,5 +49,6 @@ class Player extends BaseAudioHandler
     }
     await player.setUrl(Global.playlist[Global.playingIndex]);
     await player.play();
+    playing = player.playing;
   }
 }

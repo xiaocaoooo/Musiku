@@ -9,6 +9,8 @@ import 'package:musiku/utool.dart';
 import 'package:musiku/usersettings.dart';
 import 'package:palette_generator/palette_generator.dart';
 
+import '../lyric.dart';
+
 class PlayerPage extends StatefulWidget {
   final String? path;
 
@@ -49,6 +51,7 @@ class _PlayerPageState extends State<PlayerPage> with TickerProviderStateMixin {
     duration = meta?["duration"].toDouble() ?? 0;
     paletteGenerator = (await getPaletteGeneratorFromImage(cover))!;
     primaryColor = paletteGenerator.dominantColor!.color;
+    Global.lrcs = Lyrics(await getLyrics(path)).lrcs;
     Global.lightThemeData = ThemeData(
       colorScheme: ColorScheme.fromSeed(
           seedColor: primaryColor, brightness: Brightness.light),

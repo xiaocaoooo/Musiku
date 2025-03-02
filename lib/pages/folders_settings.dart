@@ -161,12 +161,16 @@ class _FoldersSettingsState extends State<FoldersSettings> {
               ),
             ),
             // 添加按钮
-            ElevatedButton(
-              onPressed: _showAddFolderDialog,
-              child: Text(Const.addItem),
-            ),
+            // ElevatedButton(
+            //   onPressed: _showAddFolderDialog,
+            //   child: Text(Const.addItem),
+            // ),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _showAddFolderDialog,
+        child: const Icon(Icons.add),
       ),
     );
   }

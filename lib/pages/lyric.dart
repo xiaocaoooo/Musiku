@@ -11,6 +11,7 @@ import 'package:musiku/utool.dart';
 import 'package:musiku/usersettings.dart';
 import 'package:palette_generator/palette_generator.dart';
 
+import '../android_native.dart';
 import '../lyric.dart';
 
 class LyricPage extends StatefulWidget {
@@ -61,81 +62,92 @@ class _LyricPageState extends State<LyricPage>
   }
 
   Future<void> refresh({bool auto = false}) async {
-    // print("refresh");
-    if (auto && mounted) {
-      Future.delayed(const Duration(milliseconds: 50), () {
-        refresh(auto: true);
-      });
-    }
-    if (path != Global.playlist[Global.playingIndex]) {
-      path = Global.playlist[Global.playingIndex];
-      initData();
-    }
-    if (mounted) {
-      position = Global.player.player.position.inMilliseconds.toDouble() / 1000;
-      duration =
-          Global.player.player.duration!.inMilliseconds.toDouble() / 1000 ??
-              duration;
-      lrcs = lyrics!;
-      for (int i = 0; i < lrcs.length; i++) {
-        if (i != 0 && i != lrcs.length - 1) {
-          if (lrcs[i - 1]["endTime"] <= position &&
-              lrcs[i + 1]["startTime"] >= position) {
+    try {
+      setState(() {});
+      // print("refresh");
+      if (auto && mounted) {
+        Future.delayed(const Duration(milliseconds: 50), () {
+          refresh(auto: true);
+        });
+      }
+      if (path != Global.playlist[Global.playingIndex]) {
+        path = Global.playlist[Global.playingIndex];
+        initData();
+      }
+      if (mounted) {
+        position =
+            Global.player.player.position.inMilliseconds.toDouble() / 1000;
+        duration =
+            Global.player.player.duration!.inMilliseconds.toDouble() / 1000 ??
+                duration;
+        lrcs = lyrics!;
+        Global.lrcs = lrcs;
+        for (int i = 0; i < lrcs.length; i++) {
+          if (i != 0 && i != lrcs.length - 1) {
+            if (lrcs[i - 1]["endTime"] <= position &&
+                lrcs[i + 1]["startTime"] >= position) {
+              idx = i;
+            }
+          }
+          if (lrcs[i]["startTime"] <= position &&
+              position <= lrcs[i]["endTime"]) {
             idx = i;
           }
         }
-        if (lrcs[i]["startTime"] <= position && position <= lrcs[i]["endTime"]) {
-          idx = i;
+        if (lastIdx != idx) {
+          lastIdx = idx;
+          AndroidNativeCode.sendLyric(
+              lrcs[idx]["content"].map((e) => e["text"]).join());
+          controller.animateTo(
+            max(31 * idx, 0).toDouble(),
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeInOut,
+          );
+        }
+        // if (lyric != "") {
+        //   widgets = [
+        //     const SizedBox(
+        //       height: 200,
+        //     )
+        //   ];
+        //   lrcs = lyrics.lrcs;
+        //   for (int i = 0; i < lrcs.length; i++) {
+        //     if (lrcs[i].startTime <= position && position <= lrcs[i].endTime) {
+        //       idx = i;
+        //     }
+        //     widgets.add(Lyric(
+        //       lrcs[i],
+        //       position,
+        //     ));
+        //   }
+        //   if (lastIdx != idx) {
+        //     print("idx:$idx");
+        //     lastIdx = idx;
+        //     _scrollController.animateTo(
+        //       (48 * idx).toDouble(),
+        //       duration: const Duration(milliseconds: 500),
+        //       curve: Curves.easeInOut,
+        //     );
+        //   }
+        //   // print("idx:$idx");
+        //   // double progress = (position - widgets[idx].lrc.startTime) /
+        //   //     (widgets[idx].lrc.endTime - widgets[idx].lrc.startTime);
+        //   // widgets = [
+        //   //   // ClipRRect(
+        //   //   //     clipBehavior: Clip.hardEdge,
+        //   //   //     child: Container(height: max(48 * min(1-progress, 1), 0), child: widgets[idx - 5])),
+        //   //   ...widgets.sublist(max(idx - 5, 0))
+        //   // ];
+        // }
+        try {
+          setState(() {});
+        } catch (e) {
+          //
         }
       }
-      if (lastIdx!= idx) {
-        lastIdx = idx;
-        controller.animateTo(
-          max(31 * idx, 0).toDouble(),
-          duration: const Duration(milliseconds: 500),
-          curve: Curves.easeInOut,
-        );
-      }
-      // if (lyric != "") {
-      //   widgets = [
-      //     const SizedBox(
-      //       height: 200,
-      //     )
-      //   ];
-      //   lrcs = lyrics.lrcs;
-      //   for (int i = 0; i < lrcs.length; i++) {
-      //     if (lrcs[i].startTime <= position && position <= lrcs[i].endTime) {
-      //       idx = i;
-      //     }
-      //     widgets.add(Lyric(
-      //       lrcs[i],
-      //       position,
-      //     ));
-      //   }
-      //   if (lastIdx != idx) {
-      //     print("idx:$idx");
-      //     lastIdx = idx;
-      //     _scrollController.animateTo(
-      //       (48 * idx).toDouble(),
-      //       duration: const Duration(milliseconds: 500),
-      //       curve: Curves.easeInOut,
-      //     );
-      //   }
-      //   // print("idx:$idx");
-      //   // double progress = (position - widgets[idx].lrc.startTime) /
-      //   //     (widgets[idx].lrc.endTime - widgets[idx].lrc.startTime);
-      //   // widgets = [
-      //   //   // ClipRRect(
-      //   //   //     clipBehavior: Clip.hardEdge,
-      //   //   //     child: Container(height: max(48 * min(1-progress, 1), 0), child: widgets[idx - 5])),
-      //   //   ...widgets.sublist(max(idx - 5, 0))
-      //   // ];
-      // }
-      try {
-        setState(() {});
-      } catch (e) {
-        //
-      }
+    }
+    catch (e) {
+      //
     }
   }
 

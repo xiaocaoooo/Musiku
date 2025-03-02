@@ -1,5 +1,9 @@
+import 'dart:isolate';
+
 import 'package:flutter/material.dart';
 import 'package:musiku/player.dart';
+
+import 'background.dart';
 
 class Global {
   static bool firstRun = true;
@@ -29,4 +33,7 @@ class Global {
   static List<String> playlist = [];
   static int playingIndex = -1;
   static Map<String, String> coverCache = {};
+  static ReceivePort receivePort = ReceivePort();
+  static late Isolate isolate;
+  static List<dynamic> lrcs = [];
 }
