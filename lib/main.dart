@@ -114,7 +114,7 @@ class _MyAppState extends State<MyApp> {
     // );
      return DynamicColorBuilder(
         builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
-          print("primary${(Global.darkThemeData??ThemeData(colorScheme: darkDynamic, useMaterial3: true)).colorScheme.primary}");
+          // print("primary${(Global.darkThemeData??ThemeData(colorScheme: darkDynamic, useMaterial3: true)).colorScheme.primary}");
           return MaterialApp(
             // theme: ThemeData(
             //   colorScheme: ColorScheme.fromSeed(
@@ -123,8 +123,8 @@ class _MyAppState extends State<MyApp> {
             //       brightness: MediaQuery.of(context).platformBrightness),
             //   useMaterial3: true,
             // ),
-            theme: Global.lightThemeData??ThemeData(colorScheme: lightDynamic, useMaterial3: true),
-            darkTheme: Global.darkThemeData??ThemeData(colorScheme: darkDynamic, useMaterial3: true),
+            theme: ThemeData(colorScheme: lightDynamic, useMaterial3: true),
+            darkTheme: ThemeData(colorScheme: darkDynamic, useMaterial3: true),
             // theme: Global.themeData,
             initialRoute: '/',
             // home: const BottomNavigationExample(),

@@ -1,19 +1,17 @@
 import 'dart:async';
+import 'dart:ffi';
 import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
-import 'package:mmoo_lyric/lyric.dart';
-import 'package:mmoo_lyric/lyric_controller.dart';
-import 'package:mmoo_lyric/lyric_util.dart';
-import 'package:mmoo_lyric/lyric_widget.dart';
 import 'package:musiku/auto_scrolling_text.dart';
 import 'package:musiku/global.dart';
 import 'package:musiku/utool.dart';
 import 'package:musiku/usersettings.dart';
 import 'package:palette_generator/palette_generator.dart';
-// import '../lyric.dart';
+
+import '../lyric.dart';
 
 class LyricPage extends StatefulWidget {
   LyricPage({super.key});
@@ -34,14 +32,17 @@ class _LyricPageState extends State<LyricPage>
   double position = 0;
   int idx = 0;
   int lastIdx = 0;
+  List<Map<String, dynamic>>? lyrics;
+  List<dynamic> lrcs = [];
+  List<dynamic> widgets = [];
   Color primaryColor = const Color(0xFF39C5BB);
   PaletteGenerator paletteGenerator =
       PaletteGenerator.fromColors([PaletteColor(const Color(0xFF39C5BB), 1)]);
+
+  // late ScrollController _scrollController;
   bool exist = true;
   late AnimationController _controller;
-  late LyricController controller;
-  late List<Lyric> lyrics;
-  final regExp = RegExp(r"<\d+:\d+\.\d+>");
+  late ScrollController controller;
 
   Future<void> initData() async {
     getMusicMetadata(path, cache: false);
@@ -51,9 +52,9 @@ class _LyricPageState extends State<LyricPage>
     artist = meta?["artist"] ?? "";
     album = meta?["album"] ?? "";
     duration = meta?["duration"].toDouble() ?? 0;
-    lyrics =
-        LyricUtil.formatLyric((await getLyrics(path)).replaceAll(regExp, ""));
     setState(() {});
+    lyric = await getLyrics(path);
+    lyrics = Lyrics(lyric).lrcs;
     paletteGenerator = (await getPaletteGeneratorFromImage(cover))!;
     primaryColor = paletteGenerator.dominantColor!.color;
     setState(() {});
@@ -71,12 +72,30 @@ class _LyricPageState extends State<LyricPage>
       initData();
     }
     if (mounted) {
-      setState(() {
-        position = Global.player.player.position.inSeconds.toDouble();
-        duration =
-            Global.player.player.duration?.inSeconds.toDouble() ?? duration;
-        controller.progress = Global.player.player.duration!;
-      });
+      position = Global.player.player.position.inMilliseconds.toDouble() / 1000;
+      duration =
+          Global.player.player.duration!.inMilliseconds.toDouble() / 1000 ??
+              duration;
+      lrcs = lyrics!;
+      for (int i = 0; i < lrcs.length; i++) {
+        if (i != 0 && i != lrcs.length - 1) {
+          if (lrcs[i - 1]["endTime"] <= position &&
+              lrcs[i + 1]["startTime"] >= position) {
+            idx = i;
+          }
+        }
+        if (lrcs[i]["startTime"] <= position && position <= lrcs[i]["endTime"]) {
+          idx = i;
+        }
+      }
+      if (lastIdx!= idx) {
+        lastIdx = idx;
+        controller.animateTo(
+          max(31 * idx, 0).toDouble(),
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+      }
       // if (lyric != "") {
       //   widgets = [
       //     const SizedBox(
@@ -112,12 +131,17 @@ class _LyricPageState extends State<LyricPage>
       //   //   ...widgets.sublist(max(idx - 5, 0))
       //   // ];
       // }
+      try {
+        setState(() {});
+      } catch (e) {
+        //
+      }
     }
   }
 
   Future<void> _init() async {
     // _scrollController = ScrollController();
-    controller = LyricController(vsync: this);
+    controller = ScrollController();
     path = Global.playlist[Global.playingIndex];
     await initData();
     // refresh();
@@ -186,16 +210,14 @@ class _LyricPageState extends State<LyricPage>
               //       .padding
               //       .top,
               // ),
-              SizedBox(
-                height: 200,
-              ),
               Expanded(
-                  // child: LyricsView(lrcs: lyrics??[], time: position),
-                  child: LyricWidget(
-                size: Size.infinite,
-                lyrics: lyrics,
-                controller: controller,
-              ))
+                child: LyricsView(
+                    lrcs: lyrics ?? [],
+                    time: position,
+                    padding: const EdgeInsets.symmetric(horizontal: 28),
+                    paddingTop: 200,
+                    controller: controller),
+              )
             ],
           ),
         ),
