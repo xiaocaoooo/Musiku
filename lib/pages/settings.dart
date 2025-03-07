@@ -92,6 +92,32 @@ class _SettingsState extends State<Settings> {
 
   @override
   Widget build(BuildContext context) {
+    List<List<dynamic>> _settings = [
+      [Const.language, Icons.language, DropdownMenu<String>(
+        initialSelection: _selectedLanguage,
+        onSelected: (String? value) {
+          setState(() {
+            UserSettings.setLanguage(value!);
+            Const.initialized = false;
+            Const.init();
+          });
+        },
+        dropdownMenuEntries: Const.languages
+            .map<DropdownMenuEntry<String>>((String value) {
+          return DropdownMenuEntry<String>(
+            value: value,
+            label: value,
+          );
+        }).toList(),
+      )],
+      [Const.foldersSettings, Icons.folder_copy, ElevatedButton(
+          onPressed: () {
+            Navigator.pushNamed(context, '/settings/folders');
+          },
+          child: Text(
+            Const.settings,
+          ))]
+    ];
     return Scaffold(
       appBar: AppBar(
           title: Text(
@@ -100,146 +126,180 @@ class _SettingsState extends State<Settings> {
             color: Theme.of(context).colorScheme.onSecondaryContainer),
       )),
       body: SafeArea(
-        child: Column(
-          children: [
-            SizedBox(
-                width: double.infinity,
-                height: null,
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                      top: 12.0, bottom: 12.0, left: 24.0, right: 24.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      SizedBox(
-                        child: Row(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(right: 8.0),
-                              child: Icon(
-                                Icons.language,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSecondaryContainer,
-                              ),
-                            ),
-                            Text(
-                              Const.language,
-                              style: TextStyle(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSecondaryContainer),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(
-                          child: DropdownMenu<String>(
-                        initialSelection: _selectedLanguage,
-                        onSelected: (String? value) {
-                          setState(() {
-                            UserSettings.setLanguage(value!);
-                            Const.initialized = false;
-                            Const.init();
-                          });
-                        },
-                        dropdownMenuEntries: Const.languages
-                            .map<DropdownMenuEntry<String>>((String value) {
-                          return DropdownMenuEntry<String>(
-                            value: value,
-                            label: value,
-                          );
-                        }).toList(),
-                      ))
-                    ],
+        child: ListView.builder(
+          itemCount: _settings.length,
+          itemBuilder: (BuildContext context, int index) {
+            return Padding(
+              padding: const EdgeInsets.only(
+                  top: 12.0, bottom: 12.0),
+              child: SizedBox(
+                height: 64,
+                child: ListTile(
+                  title: Text(
+                    _settings[index][0],
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSecondaryContainer),
                   ),
-                )),
-            SizedBox(
-              width: double.infinity,
-              height: null,
-              child: Padding(
-                padding: const EdgeInsets.only(
-                    top: 12.0, bottom: 12.0, left: 24.0, right: 24.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    SizedBox(
-                      child: Row(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(right: 8.0),
-                            child: Icon(
-                              Icons.folder_copy,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSecondaryContainer,
-                            ),
-                          ),
-                          Text(
-                            Const.foldersSettings,
-                            style: TextStyle(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSecondaryContainer),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                        child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.pushNamed(context, '/settings/folders');
-                            },
-                            child: Text(
-                              Const.settings,
-                            )))
-                  ],
-                ),
-              ),
-            ),
-            // SizedBox(
-            //     width: double.infinity,
-            //     height: null,
-            //     child: Padding(
-            //       padding: const EdgeInsets.only(
-            //           top: 12.0, bottom: 12.0, left: 24.0, right: 24.0),
-            //       child: Row(
-            //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //         children: [
-            //           SizedBox(
-            //             child: Row(
-            //               children: [
-            //                 Padding(
-            //                   padding: const EdgeInsets.only(right: 8.0),
-            //                   child: Icon(
-            //                     Icons.color_lens,
-            //                     color: Theme.of(context)
-            //                         .colorScheme
-            //                         .onSecondaryContainer,
-            //                   ),
-            //                 ),
-            //                 Text(
-            //                   Const.primaryColor,
-            //                   style: TextStyle(
-            //                       color: Theme.of(context)
-            //                           .colorScheme
-            //                           .onSecondaryContainer),
-            //                 ),
-            //               ],
-            //             ),
-            //           ),
-            //           SizedBox(
-            //               child: TextButton(
-            //             onPressed: _showColorInputDialog,
-            //             child: Text(_primaryColorStr!,
-            //                 style: TextStyle(color: Color(_primaryColor!))),
-            //           ))
-            //         ],
-            //       ),
-            //     )),
-          ],
-        ),
-      ),
+                  leading: Icon(
+                    _settings[index][1],
+                    color: Theme.of(context).colorScheme.onSecondaryContainer,
+                  ),
+                  trailing: _settings[index][2],
+                )
+              )
+            );
+          }
+        )
+      )
     );
+    // return Scaffold(
+    //   appBar: AppBar(
+    //       title: Text(
+    //     Const.settings,
+    //     style: TextStyle(
+    //         color: Theme.of(context).colorScheme.onSecondaryContainer),
+    //   )),
+    //   body: SafeArea(
+    //     child: Column(
+    //       children: [
+    //         SizedBox(
+    //             width: double.infinity,
+    //             height: null,
+    //             child: Padding(
+    //               padding: const EdgeInsets.only(
+    //                   top: 12.0, bottom: 12.0, left: 24.0, right: 24.0),
+    //               child: Row(
+    //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    //                 children: [
+    //                   SizedBox(
+    //                     child: Row(
+    //                       children: [
+    //                         Padding(
+    //                           padding: const EdgeInsets.only(right: 8.0),
+    //                           child: Icon(
+    //                             Icons.language,
+    //                             color: Theme.of(context)
+    //                                 .colorScheme
+    //                                 .onSecondaryContainer,
+    //                           ),
+    //                         ),
+    //                         Text(
+    //                           Const.language,
+    //                           style: TextStyle(
+    //                               color: Theme.of(context)
+    //                                   .colorScheme
+    //                                   .onSecondaryContainer),
+    //                         ),
+    //                       ],
+    //                     ),
+    //                   ),
+    //                   SizedBox(
+    //                       child: DropdownMenu<String>(
+    //                     initialSelection: _selectedLanguage,
+    //                     onSelected: (String? value) {
+    //                       setState(() {
+    //                         UserSettings.setLanguage(value!);
+    //                         Const.initialized = false;
+    //                         Const.init();
+    //                       });
+    //                     },
+    //                     dropdownMenuEntries: Const.languages
+    //                         .map<DropdownMenuEntry<String>>((String value) {
+    //                       return DropdownMenuEntry<String>(
+    //                         value: value,
+    //                         label: value,
+    //                       );
+    //                     }).toList(),
+    //                   ))
+    //                 ],
+    //               ),
+    //             )),
+    //         SizedBox(
+    //           width: double.infinity,
+    //           height: null,
+    //           child: Padding(
+    //             padding: const EdgeInsets.only(
+    //                 top: 12.0, bottom: 12.0, left: 24.0, right: 24.0),
+    //             child: Row(
+    //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    //               children: [
+    //                 SizedBox(
+    //                   child: Row(
+    //                     children: [
+    //                       Padding(
+    //                         padding: const EdgeInsets.only(right: 8.0),
+    //                         child: Icon(
+    //                           Icons.folder_copy,
+    //                           color: Theme.of(context)
+    //                               .colorScheme
+    //                               .onSecondaryContainer,
+    //                         ),
+    //                       ),
+    //                       Text(
+    //                         Const.foldersSettings,
+    //                         style: TextStyle(
+    //                             color: Theme.of(context)
+    //                                 .colorScheme
+    //                                 .onSecondaryContainer),
+    //                       ),
+    //                     ],
+    //                   ),
+    //                 ),
+    //                 SizedBox(
+    //                     child: ElevatedButton(
+    //                         onPressed: () {
+    //                           Navigator.pushNamed(context, '/settings/folders');
+    //                         },
+    //                         child: Text(
+    //                           Const.settings,
+    //                         )))
+    //               ],
+    //             ),
+    //           ),
+    //         ),
+    //         // SizedBox(
+    //         //     width: double.infinity,
+    //         //     height: null,
+    //         //     child: Padding(
+    //         //       padding: const EdgeInsets.only(
+    //         //           top: 12.0, bottom: 12.0, left: 24.0, right: 24.0),
+    //         //       child: Row(
+    //         //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    //         //         children: [
+    //         //           SizedBox(
+    //         //             child: Row(
+    //         //               children: [
+    //         //                 Padding(
+    //         //                   padding: const EdgeInsets.only(right: 8.0),
+    //         //                   child: Icon(
+    //         //                     Icons.color_lens,
+    //         //                     color: Theme.of(context)
+    //         //                         .colorScheme
+    //         //                         .onSecondaryContainer,
+    //         //                   ),
+    //         //                 ),
+    //         //                 Text(
+    //         //                   Const.primaryColor,
+    //         //                   style: TextStyle(
+    //         //                       color: Theme.of(context)
+    //         //                           .colorScheme
+    //         //                           .onSecondaryContainer),
+    //         //                 ),
+    //         //               ],
+    //         //             ),
+    //         //           ),
+    //         //           SizedBox(
+    //         //               child: TextButton(
+    //         //             onPressed: _showColorInputDialog,
+    //         //             child: Text(_primaryColorStr!,
+    //         //                 style: TextStyle(color: Color(_primaryColor!))),
+    //         //           ))
+    //         //         ],
+    //         //       ),
+    //         //     )),
+    //       ],
+    //     ),
+    //   ),
+    // );
   }
 }
