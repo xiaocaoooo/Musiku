@@ -185,6 +185,8 @@ class LyricsView extends StatefulWidget {
   EdgeInsets padding = EdgeInsets.zero;
   double paddingTop = 0;
   ScrollController controller;
+  Color secondaryColor;
+  Color primaryColor;
 
   LyricsView(
       {super.key,
@@ -192,7 +194,9 @@ class LyricsView extends StatefulWidget {
       required this.time,
       required this.padding,
       required this.paddingTop,
-      required this.controller});
+      required this.controller,
+      required this.secondaryColor,
+      required this.primaryColor});
 
   @override
   State<LyricsView> createState() => _LyricsViewState();
@@ -211,8 +215,10 @@ class _LyricsViewState extends State<LyricsView> {
 
   @override
   Widget build(BuildContext context) {
-    final secondaryColor = Colors.white.withOpacity(0.4);
-    final primaryColor = Colors.white.withOpacity(0.8);
+    // final secondaryColor = Colors.white.withOpacity(0.4);
+    // final primaryColor = Colors.white.withOpacity(0.8);
+    final secondaryColor = widget.secondaryColor;
+    final primaryColor = widget.primaryColor;
     // final secondaryColor = Colors.green;
     // final primaryColor = Colors.red;
     const double fontSize = 22.0;
@@ -249,7 +255,7 @@ class _LyricsViewState extends State<LyricsView> {
       ]
     };
     String laterLyrics = "";
-    int crtIdx = 0;
+    int crtIdx = -1;
 
     print(widget.lrcs.length);
     for (var i = 0; i < widget.lrcs.length; i++) {
@@ -279,11 +285,12 @@ class _LyricsViewState extends State<LyricsView> {
       //   lastLyric = widget.lrcs[i];
       //   continue;
       // }
-      if(i>=1){
+      if(i>=1&&widget.lrcs[i-1]["endTime"] <= widget.time){
         if(i>=2){
           previousLyrics +=
               "${previousLyrics == ""? "" : "\n"}${lastLyric["text"]}";
         }
+        // print("lastLyric: ${i-1}");
         lastLyric = widget.lrcs[i-1];
       }
       if (widget.lrcs[i]["startTime"] > widget.time) {
@@ -374,13 +381,13 @@ class _LyricsViewState extends State<LyricsView> {
                   style: textStyle.copyWith(color: primaryColor),
                   textAlign: TextAlign.start,
                 )),
-            // SizedBox(
-            //     width: double.infinity,
-            //     child: Text(
-            //       lastLyric["text"],
-            //       style: textStyle.copyWith(color: primaryColor),
-            //       textAlign: TextAlign.start,
-            //     )),
+            SizedBox(
+                width: double.infinity,
+                child: Text(
+                  lastLyric["text"],
+                  style: textStyle.copyWith(color: primaryColor),
+                  textAlign: TextAlign.start,
+                )),
             // Wrap(children: [Text(pre, textAlign: TextAlign.start,),GradientText(
             //     text: crt,
             //     style: textStyle,

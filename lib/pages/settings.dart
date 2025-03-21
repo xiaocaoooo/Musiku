@@ -11,12 +11,19 @@ class Settings extends StatefulWidget {
 
 class _SettingsState extends State<Settings> {
   String? _selectedLanguage;
+  int? _selectedTheme;
+  static List<String> _theme=[
+    "封面取色",
+    "跟随系统",
+    "封面模糊"
+  ];
   // int? _primaryColor;
   // String? _primaryColorStr;
 
   // 异步方法用于初始化语言选择
   Future<void> _init() async {
     _selectedLanguage = await UserSettings.getLanguage();
+    _selectedTheme = await UserSettings.getTheme();
     // _primaryColor = await UserSettings.getPrimaryColor();
     // _primaryColorStr = '#${_primaryColor?.toRadixString(16).padLeft(8, '0')}';
     setState(() {});
@@ -116,7 +123,22 @@ class _SettingsState extends State<Settings> {
           },
           child: Text(
             Const.settings,
-          ))]
+          ))],
+      [Const.theme, Icons.color_lens, DropdownMenu<String>(
+        initialSelection: _theme[_selectedTheme!],
+        onSelected: (String? value) {
+          setState(() {
+            UserSettings.setTheme(_theme.indexOf(value!));
+          });
+        },
+        dropdownMenuEntries: _theme
+            .map<DropdownMenuEntry<String>>((String value) {
+          return DropdownMenuEntry<String>(
+            value: value,
+            label: value,
+          );
+        }).toList(),
+      )],
     ];
     return Scaffold(
       appBar: AppBar(

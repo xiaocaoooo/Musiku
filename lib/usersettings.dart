@@ -11,6 +11,7 @@ class UserSettings {
   static const String _foldersKey = 'folders';
   static const String _musicInfoKey = 'musicInfo';
   static const String _musicListKey = 'musicList';
+  static const String _theme = 'theme';
 
   // 初始化用户设置，设置默认值
   static Future<void> initSettings() async {
@@ -38,6 +39,9 @@ class UserSettings {
     }
     if (!prefs.containsKey(_musicListKey)) {
       await prefs.setStringList(_musicListKey, []);
+    }
+    if (!prefs.containsKey(_theme)) {
+      await prefs.setInt(_theme, 0);
     }
   }
 
@@ -148,5 +152,15 @@ class UserSettings {
   static Future<List> getMusicList() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getStringList(_musicListKey) ?? [];
+  }
+
+  static Future<int> getTheme() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(_theme) ?? 0;
+  }
+
+  static Future<void> setTheme(int theme) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_theme, theme);
   }
 }
