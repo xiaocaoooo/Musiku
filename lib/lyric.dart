@@ -74,6 +74,7 @@ class Lyrics {
           lrcs.add({
             "startTime": startTime,
             "endTime": endTime,
+            "text": text,
             "content": [
               {
                 "startTime": startTime,
@@ -129,6 +130,7 @@ class Lyrics {
             lrcs.add({
               "startTime": startTime,
               "endTime": endTime,
+              "text": words.map((e) => e["text"]).join(),
               "content": words,
             });
           } else {
@@ -147,6 +149,7 @@ class Lyrics {
             lrcs.add({
               "startTime": startTime,
               "endTime": endTime,
+              "text": text,
               "content": [
                 {
                   "startTime": startTime,
@@ -212,8 +215,10 @@ class _LyricsViewState extends State<LyricsView> {
     final primaryColor = Colors.white.withOpacity(0.8);
     // final secondaryColor = Colors.green;
     // final primaryColor = Colors.red;
+    const double fontSize = 22.0;
+    const double maxFontSize = 28.0;
     const textStyle = TextStyle(
-      fontSize: 22,
+      fontSize: fontSize,
       fontWeight: FontWeight.bold,
     );
     // const padding=EdgeInsets.zero;
@@ -222,6 +227,7 @@ class _LyricsViewState extends State<LyricsView> {
     Map<String, dynamic> lastLyric = {
       "startTime": -1,
       "endTime": -1,
+      "text": "",
       "content": [
         {"startTime": -1, "endTime": -1, "text": ""}
       ]
@@ -229,6 +235,7 @@ class _LyricsViewState extends State<LyricsView> {
     Map<String, dynamic> currentLyric = {
       "startTime": -1,
       "endTime": -1,
+      "text": "",
       "content": [
         {"startTime": -1, "endTime": -1, "text": ""}
       ]
@@ -236,6 +243,7 @@ class _LyricsViewState extends State<LyricsView> {
     Map<String, dynamic> nextLyric = {
       "startTime": -1,
       "endTime": -1,
+      "text": "",
       "content": [
         {"startTime": -1, "endTime": -1, "text": ""}
       ]
@@ -258,18 +266,25 @@ class _LyricsViewState extends State<LyricsView> {
           }
         }
       }
-      if (widget.lrcs[i]["endTime"] <= widget.time) {
-        if (i == 0) {
-          lastLyric = widget.lrcs[i];
-          continue;
+      // if (widget.lrcs[i]["endTime"] <= widget.time) { // previousLyrics添加i-2
+      //   if (i == 0) {
+      //     lastLyric = widget.lrcs[i];
+      //     continue;
+      //   }
+      //   previousLyrics +=
+      //       "${previousLyrics == "" ? "" : "\n"}${lastLyric["text"]}";
+      //   // for (var j = 0; j < lastLyric["content"].length; j++) {
+      //   //   previousLyrics += lastLyric["content"][j]["text"];
+      //   // }
+      //   lastLyric = widget.lrcs[i];
+      //   continue;
+      // }
+      if(i>=1){
+        if(i>=2){
+          previousLyrics +=
+              "${previousLyrics == ""? "" : "\n"}${lastLyric["text"]}";
         }
-        previousLyrics +=
-            "${previousLyrics == "" ? "" : "\n"}${lastLyric["content"].map((e) => e["text"]).join()}";
-        // for (var j = 0; j < lastLyric["content"].length; j++) {
-        //   previousLyrics += lastLyric["content"][j]["text"];
-        // }
-        lastLyric = widget.lrcs[i];
-        continue;
+        lastLyric = widget.lrcs[i-1];
       }
       if (widget.lrcs[i]["startTime"] > widget.time) {
         if (i > 1 &&
@@ -282,7 +297,7 @@ class _LyricsViewState extends State<LyricsView> {
         //   laterLyrics += widget.lrcs[i]["content"][j]["text"];
         // }
         laterLyrics +=
-            "${laterLyrics == "" ? "" : "\n"}${widget.lrcs[i]["content"].map((e) => e["text"]).join()}";
+            "${laterLyrics == "" ? "" : "\n"}${widget.lrcs[i]["text"]}";
         continue;
       }
       currentLyric = widget.lrcs[i];
@@ -343,6 +358,7 @@ class _LyricsViewState extends State<LyricsView> {
             end: Alignment.centerRight,
           )));
     }
+    print("lastLyric: ${lastLyric["text"]}");
     return Padding(
       padding: widget.padding,
       child: SingleChildScrollView(
@@ -358,6 +374,13 @@ class _LyricsViewState extends State<LyricsView> {
                   style: textStyle.copyWith(color: primaryColor),
                   textAlign: TextAlign.start,
                 )),
+            // SizedBox(
+            //     width: double.infinity,
+            //     child: Text(
+            //       lastLyric["text"],
+            //       style: textStyle.copyWith(color: primaryColor),
+            //       textAlign: TextAlign.start,
+            //     )),
             // Wrap(children: [Text(pre, textAlign: TextAlign.start,),GradientText(
             //     text: crt,
             //     style: textStyle,
@@ -372,7 +395,7 @@ class _LyricsViewState extends State<LyricsView> {
             //     )
             // ),Text(lat, textAlign: TextAlign.start,)],),
             // GradientText(
-            //   text: currentLyric["content"].map((e) => e["text"]).join(),
+            //   text: currentLyric["text"],
             //   style: textStyle,
             //   gradient: LinearGradient(
             //     colors: [
@@ -388,7 +411,7 @@ class _LyricsViewState extends State<LyricsView> {
             SizedBox(
                 width: double.infinity,
                 child: Text(
-                  nextLyric["content"].map((e) => e["text"]).join(),
+                  nextLyric["text"],
                   style: textStyle.copyWith(color: secondaryColor),
                   textAlign: TextAlign.start,
                 )),

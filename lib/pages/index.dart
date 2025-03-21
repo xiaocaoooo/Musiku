@@ -107,7 +107,11 @@ class _IndexPageState extends State<IndexPage> {
           ),
         ),
         body: Center(
-          child: Text('处理完成，即将退出 ($exitNumber)'),
+          child: Text(
+            '处理完成，即将退出 ($exitNumber)',
+            style: TextStyle(
+                color: Theme.of(context).colorScheme.onSecondaryContainer),
+          ),
         ),
       );
     }
@@ -128,7 +132,9 @@ class _IndexPageState extends State<IndexPage> {
             ),
             const SizedBox(height: 16),
             Text(
-                '$_processedMusicCount/${(_musicList.length != 0 ? _musicList.length : "NaN")}'),
+                '$_processedMusicCount/${(_musicList.length != 0 ? _musicList.length : "NaN")}',
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSecondaryContainer)),
           ],
         ),
       ),

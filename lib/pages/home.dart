@@ -99,32 +99,30 @@ class _HomePageState extends State<HomePage> {
       // 文件存在，读取本地文件
       String content = await file.readAsString();
       int color = int.parse(content);
-      setState(() {
-        // paletteGenerator = pg;
-        imageTheme = ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: Color(color),
-            brightness: Theme.of(context).brightness,
-          ),
-          useMaterial3: true,
-        );
-      });
+      // paletteGenerator = pg;
+      imageTheme = ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Color(color),
+          brightness: Theme.of(context).brightness,
+        ),
+        useMaterial3: true,
+      );
+      setState(() {});
       return;
     }
     try {
       final pg = await getPaletteGeneratorFromImage(imagePath);
       if (pg != null) {
         file.writeAsString(pg.dominantColor!.color.value.toString());
-        setState(() {
-          // paletteGenerator = pg;
-          imageTheme = ThemeData(
-            colorScheme: ColorScheme.fromSeed(
-              seedColor: pg.dominantColor!.color,
-              brightness: Theme.of(context).brightness,
-            ),
-            useMaterial3: true,
-          );
-        });
+        // paletteGenerator = pg;
+        imageTheme = ThemeData(
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: pg.dominantColor!.color,
+            brightness: Theme.of(context).brightness,
+          ),
+          useMaterial3: true,
+        );
+        setState(() {});
       }
     } catch (e) {
       // print('请求出错: $e');

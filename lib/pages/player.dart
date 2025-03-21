@@ -99,8 +99,8 @@ class _PlayerPageState extends State<PlayerPage> with TickerProviderStateMixin {
     path = Global.playlist[Global.playingIndex];
     initData();
     if (widget.path != null) {
-      Global.player.player.setFilePath(widget.path!);
-      Global.player.player.play();
+      Global.player.setFilePath(widget.path!);
+      Global.player.play();
     }
     refresh(auto: true);
 
@@ -367,8 +367,8 @@ class _PlayerPageState extends State<PlayerPage> with TickerProviderStateMixin {
                                 icon: Icon(Ionicons.play_back,
                                     color: Colors.white.withOpacity(0.6),
                                     size: 48),
-                                onPressed: () {
-                                  Global.player.previous();
+                                onPressed: () async {
+                                  await Global.player.previous();
                                   refresh();
                                   setState(() {});
                                 },
@@ -387,14 +387,15 @@ class _PlayerPageState extends State<PlayerPage> with TickerProviderStateMixin {
                                     size: 48,
                                   ),
                                 ),
-                                onPressed: () {
+                                onPressed: () async {
                                   if (Global.player.player.playing) {
                                     setScale(0.9);
-                                    Global.player.player.pause();
+                                    await Global.player.pause();
                                   } else {
                                     setScale(1);
-                                    Global.player.player.play();
+                                    await Global.player.play();
                                   }
+                                  // Global.player.setInfo();
                                   refresh();
                                   setState(() {});
                                 },
@@ -404,8 +405,8 @@ class _PlayerPageState extends State<PlayerPage> with TickerProviderStateMixin {
                                 icon: Icon(Ionicons.play_forward,
                                     color: Colors.white.withOpacity(0.6),
                                     size: 48),
-                                onPressed: () {
-                                  Global.player.next();
+                                onPressed: () async {
+                                  await Global.player.next();
                                   refresh();
                                   setState(() {});
                                 },

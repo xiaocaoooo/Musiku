@@ -40,8 +40,9 @@ dependencies:
   flutter_radio_player: ^2.0.2
   ionicons: ^0.2.2
   url_launcher: ^6.1.14
-  mmoo_lyric: ^1.0.0
+#  mmoo_lyric: ^1.0.0
   plugin_platform_interface: ^2.1.8
+  fluttertoast: ^8.2.5
 
 dev_dependencies:
   flutter_test:

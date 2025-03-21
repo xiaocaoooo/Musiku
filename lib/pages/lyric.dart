@@ -99,7 +99,7 @@ class _LyricPageState extends State<LyricPage>
           AndroidNativeCode.sendLyric(
               lrcs[idx]["content"].map((e) => e["text"]).join());
           controller.animateTo(
-            max(31 * idx, 0).toDouble(),
+            max(31 * idx-150, 0).toDouble(),
             duration: const Duration(milliseconds: 500),
             curve: Curves.easeInOut,
           );
