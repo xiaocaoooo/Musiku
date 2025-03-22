@@ -103,7 +103,7 @@ class _MusicListPageState extends State<MusicListPage> {
     setState(() {
       _processedMusicCount++; // 增加已处理的音乐文件数量
     });
-    print("musiclist: $music ($_processedMusicCount/${_musicList.length})");
+    // print("musiclist: $music ($_processedMusicCount/${_musicList.length})");
     // if (!flag) {
     //   _sortMusicList();
     // }

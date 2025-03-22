@@ -34,7 +34,7 @@ class _InfoState extends State<Info> {
             String url =
                 'mqqapi://card/show_pslcard?src_type=internal&version=1&uin=${groupNumber}&card_type=group&source=qrcode';
             // String url = "https://xiaocaoooo.github.io";
-            print(url);
+            // print(url);
             if (!await launchUrl(Uri.parse(url))) {
               // 提示用户安装 QQ 应用
               showDialog(
@@ -56,7 +56,7 @@ class _InfoState extends State<Info> {
               );
             }
           } catch (e) {
-            print('Error: $e');
+            // print('Error: $e');
           }
         }
       ],
@@ -66,7 +66,7 @@ class _InfoState extends State<Info> {
         () async {
           try {
             String url = "https://github.com/xiaocaoooo/Musiku";
-            print(url);
+            // print(url);
             if (!await launchUrl(Uri.parse(url))) {
               // 提示用户安装 QQ 应用
               showDialog(
@@ -88,7 +88,7 @@ class _InfoState extends State<Info> {
               );
             }
           } catch (e) {
-            print('Error: $e');
+            // print('Error: $e');
           }
         }
       ],

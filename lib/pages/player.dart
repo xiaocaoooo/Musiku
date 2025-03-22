@@ -27,7 +27,6 @@ class _PlayerPageState extends State<PlayerPage> with TickerProviderStateMixin {
   String cover = "";
   ThemeData? theme;
   int themeIndex = 0;
-
   Color primaryColor = const Color(0xFF39C5BB);
   PaletteGenerator paletteGenerator =
       PaletteGenerator.fromColors([PaletteColor(const Color(0xFF39C5BB), 1)]);
@@ -35,8 +34,11 @@ class _PlayerPageState extends State<PlayerPage> with TickerProviderStateMixin {
   // 新增下滑动画控制器
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
+  final PageController _pageController = PageController();
+  double _progress = 0; // 当前页面滑动进度（0~1）
 
   Future<void> initData() async {
+    // print("initData: $path");
     cover = (await getCover(path))!;
     paletteGenerator = (await getPaletteGeneratorFromImage(cover))!;
     primaryColor = paletteGenerator.dominantColor!.color;
@@ -57,6 +59,7 @@ class _PlayerPageState extends State<PlayerPage> with TickerProviderStateMixin {
       Global.player.setFilePath(widget.path!);
       Global.player.play();
     }
+    refresh(auto: true);
 
     // 初始化下滑动画控制器
     _slideController = AnimationController(
@@ -76,12 +79,35 @@ class _PlayerPageState extends State<PlayerPage> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _init();
+    _pageController.addListener(_handleScroll);
   }
 
   @override
   void dispose() {
     _slideController.dispose();
+    _pageController.removeListener(_handleScroll);
+    _pageController.dispose();
     super.dispose();
+  }
+
+  Future<void> refresh({bool auto = false}) async {
+    if (path != Global.playlist[Global.playingIndex]) {
+      path = Global.playlist[Global.playingIndex];
+      initData();
+    }
+    setState(() {});
+    if (auto && mounted) {
+      Future.delayed(
+          const Duration(milliseconds: 500), () => refresh(auto: true));
+    }
+  }
+
+  void _handleScroll() {
+    final page = _pageController.page ?? 0.0;
+    setState(() {
+      _progress = page; // 获取0~1之间的进度
+      // print("progress: $_progress");
+    });
   }
 
   void _handleVerticalDragUpdate(DragUpdateDetails details) {
@@ -109,18 +135,16 @@ class _PlayerPageState extends State<PlayerPage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     // widget.path=null;
-    Widget background = Expanded(
-        child: Container(
-      color: theme?.colorScheme.secondaryContainer ?? Theme.of(context).colorScheme.secondaryContainer,
-    ));
+    Widget background = Container(
+      color: theme?.colorScheme.secondaryContainer ??
+          Theme.of(context).colorScheme.secondaryContainer,
+    );
     if (themeIndex == 1) {
-      background = Expanded(
-          child: Container(
+      background = Container(
         color: Theme.of(context).colorScheme.secondaryContainer,
-      ));
+      );
     } else if (themeIndex == 2) {
-      background = Expanded(
-          child: Stack(children: [
+      background = Stack(children: [
         cover != ""
             ? Image.file(
                 File(cover),
@@ -135,7 +159,7 @@ class _PlayerPageState extends State<PlayerPage> with TickerProviderStateMixin {
             color: Colors.black.withOpacity(0.1),
           ),
         )
-      ]));
+      ]);
     }
     return Scaffold(
         body: GestureDetector(
@@ -145,10 +169,57 @@ class _PlayerPageState extends State<PlayerPage> with TickerProviderStateMixin {
               background,
               SlideTransition(
                   position: _slideAnimation,
-                  child: PageView(children: [
-                    const Expanded(child: PlayingPage()),
-                    Expanded(child: LyricPage())
-                  ]))
+                  child: PageView(
+                      controller: _pageController,
+                      children: [const PlayingPage(), LyricPage()])),
+              Builder(builder: (context) {
+                final l1 = MediaQuery.of(context).size.width / 2 - 150;
+                const l2 = 25;
+                final t1 = MediaQuery.of(context).size.height * 0.18;
+                final t2 = MediaQuery.of(context).padding.top + 16;
+                const double s1=300;
+                const double s2=100;
+                return Positioned(
+                    // left: MediaQuery.of(context).size.width / 2 - 150,
+                    // top: MediaQuery.of(context).size.height * 0.18,
+                    // left: 28,
+                    // top: MediaQuery.of(context).padding.top+16,
+                    left:
+                        l1 + Curves.easeInOut.transform(_progress) * (l2 - l1),
+                    top: t1 + Curves.easeInOut.transform(_progress) * (t2 - t1),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            spreadRadius: 5,
+                            blurRadius: 7,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(16.0)),
+                        clipBehavior: Clip.hardEdge,
+                        child: Container(
+                          decoration: const BoxDecoration(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(16.0)),
+                          ),
+                          child: cover != ""
+                              ? Image.file(
+                                  File(cover),
+                                  width: s1 + Curves.easeInOut.transform(_progress) * (s2 - s1),
+                                  height: s1 + Curves.easeInOut.transform(_progress) * (s2 - s1),
+                                )
+                              : Image.asset(
+                                  "assets/images/default_player_cover.jpg"),
+                        ),
+                      ),
+                    ));
+              })
             ])));
   }
 }

@@ -32,7 +32,7 @@ Future<Map<String, dynamic>?> getMusicMetadata(String filePath,
       final jsonString = await jsonFile.readAsString();
       final metadata = json.decode(jsonString);
       // getCover(filePath);
-      print("metadata : $metadata");
+      // print("metadata : $metadata");
       Global.musicInfo[metadata["filePath"]] = metadata;
       return metadata;
     }
@@ -162,7 +162,7 @@ Future<String?> getCover(String filePath, {cache = true}) async {
     await flutterFFmpeg
         .execute('-i $filePath -y -an -vcodec copy $tempFilePath');
   } catch (e) {
-    print(e);
+    // print(e);
   }
   if (await File(tempFilePath).exists()) {
     Global.coverCache[filePath] = tempFilePath;
@@ -173,7 +173,7 @@ Future<String?> getCover(String filePath, {cache = true}) async {
 
 Future<Color?> getPrimaryColorFromImage(String filePath) async {
   try {
-    print("getPrimaryColorFromImage: ${filePath}");
+    // print("getPrimaryColorFromImage: ${filePath}");
     // 根据文件路径创建一个本地图片提供者
     final imageProvider = FileImage(File(filePath));
     // 从图片提供者生成调色板
@@ -181,18 +181,18 @@ Future<Color?> getPrimaryColorFromImage(String filePath) async {
       imageProvider,
     );
     // 获取主色调，如果主色调为空则返回白色
-    print("getPrimaryColorFromImage: ${paletteGenerator.dominantColor?.color}");
+    // print("getPrimaryColorFromImage: ${paletteGenerator.dominantColor?.color}");
     return paletteGenerator.dominantColor?.color;
   } catch (e) {
     // 若出现异常，打印错误信息并返回白色
-    print('Error getting primary color: $e');
+    // print('Error getting primary color: $e');
     return null;
   }
 }
 
 Future<PaletteGenerator?> getPaletteGeneratorFromImage(String filePath) async {
   try {
-    print("getPrimaryColorFromImage: ${filePath}");
+    // print("getPrimaryColorFromImage: ${filePath}");
     // 根据文件路径创建一个本地图片提供者
     final imageProvider = FileImage(File(filePath));
     // 从图片提供者生成调色板
@@ -202,14 +202,14 @@ Future<PaletteGenerator?> getPaletteGeneratorFromImage(String filePath) async {
     return paletteGenerator;
   } catch (e) {
     // 若出现异常，打印错误信息并返回白色
-    print('Error getting primary color: $e');
+    // print('Error getting primary color: $e');
     return null;
   }
 }
 
 Future<PaletteGenerator?> getPaletteGeneratorFromImageURL(String url) async {
   try {
-    print("getPrimaryColorFromImage: $url");
+    // print("getPrimaryColorFromImage: $url");
     // 根据文件路径创建一个本地图片提供者
     final imageProvider = NetworkImage(url);
     // 从图片提供者生成调色板
@@ -219,7 +219,7 @@ Future<PaletteGenerator?> getPaletteGeneratorFromImageURL(String url) async {
     return paletteGenerator;
   } catch (e) {
     // 若出现异常，打印错误信息并返回白色
-    print('Error getting primary color: $e');
+    // print('Error getting primary color: $e');
     return null;
   }
 }
@@ -235,13 +235,13 @@ Future<dynamic> getBingImageInfo() async {
     if (response.statusCode == 200) {
       final jsonFile = File(tempJsonPath);
       await jsonFile.writeAsString(response.body);
-      print("getBingImageInfo: ${json.decode(response.body)}");
+      // print("getBingImageInfo: ${json.decode(response.body)}");
       return json.decode(response.body);
     }
   } else {
     final jsonFile = File(tempJsonPath);
     final jsonString = await jsonFile.readAsString();
-    print("getBingImageInfo: ${json.decode(jsonString)}");
+    // print("getBingImageInfo: ${json.decode(jsonString)}");
     return json.decode(jsonString);
   }
 }
@@ -254,7 +254,7 @@ Future<String?> getBingImage() async {
   try {
     jsonData = await getBingImageInfo();
     // print("getBingImage123${jsonData}");
-    print("getBingImage: ${jsonData['images'][0]['url']}");
+    // print("getBingImage: ${jsonData['images'][0]['url']}");
     if (!File(tempImgPath).existsSync()) {
       await downloadFile(
           'https://cn.bing.com${jsonData['images'][0]['url']}', tempImgPath);

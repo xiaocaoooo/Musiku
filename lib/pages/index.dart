@@ -55,7 +55,7 @@ class _IndexPageState extends State<IndexPage> {
     setState(() {
       _processedMusicCount++; // 增加已处理的音乐文件数量
     });
-    print("musiclist: $music ($_processedMusicCount/${_musicList.length})");
+    // print("musiclist: $music ($_processedMusicCount/${_musicList.length})");
     if (_processedMusicCount >= _musicList.length) {
       exit();
     }

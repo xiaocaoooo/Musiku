@@ -28,7 +28,7 @@ class UserData{
       return jsonData; // 返回解析后的JSON数据Map
     } catch (e) {
       // 捕获JSON解析过程中可能发生的错误，例如文件内容不是合法的JSON格式
-      print('Error parsing JSON: $e'); // 打印错误信息到控制台
+      // print('Error parsing JSON: $e'); // 打印错误信息到控制台
       return {}; // 解析出错时返回空Map，作为错误处理
     }
   }
@@ -40,14 +40,14 @@ class UserData{
     Directory directory = Directory(path_lib.join(dataDir.path, path_lib.dirname(filepath)));
     await directory.create(recursive: true); // 创建目录，如果父目录不存在也会一并创建
     File file = File(path_lib.join(dataDir.path, filepath)); // 创建文件对象，指定文件路径
-    print("userdata: ${file.path} $data");
+    // print("userdata: ${file.path} $data");
     try {
       String jsonString = jsonEncode(data); // 使用jsonEncode函数将Map数据编码为JSON字符串
-      print("userdata: $jsonString");
+      // print("userdata: $jsonString");
       await file.writeAsString(jsonString); // 异步将JSON字符串写入文件
     } catch (e) {
       // 捕获文件写入或JSON编码过程中可能发生的错误
-      print('Error writing JSON: $e'); // 打印错误信息到控制台
+      // print('Error writing JSON: $e'); // 打印错误信息到控制台
       // 你可以选择在这里抛出异常，或者进行其他错误处理，例如返回错误状态
     }
   }

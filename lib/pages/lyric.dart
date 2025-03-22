@@ -108,7 +108,8 @@ class _LyricPageState extends State<LyricPage>
           AndroidNativeCode.sendLyric(
               lrcs[idx]["content"].map((e) => e["text"]).join());
           controller.animateTo(
-            max(31 * idx-150, 0).toDouble(),
+            // max(31 * idx, 0).toDouble(),
+            (controller.position.maxScrollExtent) * (idx / Global.lrcs.length),
             duration: const Duration(milliseconds: 500),
             curve: Curves.easeInOut,
           );
@@ -154,8 +155,7 @@ class _LyricPageState extends State<LyricPage>
           //
         }
       }
-    }
-    catch (e) {
+    } catch (e) {
       //
     }
   }
@@ -222,31 +222,19 @@ class _LyricPageState extends State<LyricPage>
       //   ),
       // ),
       Container(
-        child: Column(
-          children: [
-            // SizedBox(
-            //   height: MediaQuery
-            //       .of(context)
-            //       .padding
-            //       .top,
-            // ),
-            Expanded(
-              child: LyricsView(
-                  lrcs: lyrics ?? [],
-                  time: position,
-                  padding: const EdgeInsets.symmetric(horizontal: 28),
-                  paddingTop: 200,
-                  controller: controller,
-                  secondaryColor: themeIndex == 1
-                      ? Theme.of(context).colorScheme.onBackground
-                      : (theme?.colorScheme.onBackground ??
-                      Colors.white),
-                  primaryColor: themeIndex == 1
-                      ? Theme.of(context).colorScheme.primary
-                      : (theme?.colorScheme.primary ??
-                      Colors.white),),
-            )
-          ],
+        child: LyricsView(
+          lrcs: lyrics ?? [],
+          time: position,
+          padding: const EdgeInsets.symmetric(horizontal: 28),
+          paddingTop: 200,
+          controller: controller,
+          secondaryColor: (themeIndex == 1
+                  ? Theme.of(context).colorScheme.onBackground
+                  : (theme?.colorScheme.onBackground ?? Colors.white))
+              .withOpacity(0.5),
+          primaryColor: (themeIndex == 1
+              ? Theme.of(context).colorScheme.primary
+              : (theme?.colorScheme.primary ?? Colors.white)),
         ),
       ),
       ClipRRect(
@@ -271,37 +259,41 @@ class _LyricPageState extends State<LyricPage>
                         height: 100,
                         child: Row(
                           children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.2),
-                                    spreadRadius: 5,
-                                    blurRadius: 7,
-                                    offset: const Offset(0, 3),
-                                  ),
-                                ],
-                              ),
-                              child: ClipRRect(
-                                borderRadius: const BorderRadius.all(
-                                    Radius.circular(16.0)),
-                                clipBehavior: Clip.hardEdge,
-                                child: Container(
-                                  decoration: const BoxDecoration(
-                                    borderRadius: BorderRadius.all(
-                                        Radius.circular(16.0)),
-                                  ),
-                                  child: cover != ""
-                                      ? Image.file(
-                                    File(cover),
-                                    width: 100,
-                                    height: 100,
-                                  )
-                                      : Image.asset(
-                                      "assets/images/default_player_cover.jpg"),
-                                ),
-                              ),
+                            // Container(
+                            //   decoration: BoxDecoration(
+                            //     borderRadius: BorderRadius.circular(16),
+                            //     boxShadow: [
+                            //       BoxShadow(
+                            //         color: Colors.black.withOpacity(0.2),
+                            //         spreadRadius: 5,
+                            //         blurRadius: 7,
+                            //         offset: const Offset(0, 3),
+                            //       ),
+                            //     ],
+                            //   ),
+                            //   child: ClipRRect(
+                            //     borderRadius: const BorderRadius.all(
+                            //         Radius.circular(16.0)),
+                            //     clipBehavior: Clip.hardEdge,
+                            //     child: Container(
+                            //       decoration: const BoxDecoration(
+                            //         borderRadius:
+                            //             BorderRadius.all(Radius.circular(16.0)),
+                            //       ),
+                            //       child: cover != ""
+                            //           ? Image.file(
+                            //               File(cover),
+                            //               width: 100,
+                            //               height: 100,
+                            //             )
+                            //           : Image.asset(
+                            //               "assets/images/default_player_cover.jpg"),
+                            //     ),
+                            //   ),
+                            // ),
+                            const SizedBox(
+                              width: 100,
+                              height: 100,
                             ),
                             Expanded(
                               child: Padding(
@@ -309,17 +301,20 @@ class _LyricPageState extends State<LyricPage>
                                 // 这里设置 Column 的 mainAxisAlignment 为 center 实现上下居中
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     AutoScrollingText(
                                       text: title,
                                       style: TextStyle(
                                         fontSize: 24,
                                         color: (themeIndex == 1
-                                            ? Theme.of(context).colorScheme.onBackground
-                                            : (theme?.colorScheme.onBackground ??
-                                            Colors.white)).withOpacity(0.8),
+                                                ? Theme.of(context)
+                                                    .colorScheme
+                                                    .onBackground
+                                                : (theme?.colorScheme
+                                                        .onBackground ??
+                                                    Colors.white))
+                                            .withOpacity(0.8),
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
@@ -329,9 +324,13 @@ class _LyricPageState extends State<LyricPage>
                                       style: TextStyle(
                                         fontSize: 18,
                                         color: (themeIndex == 1
-                                            ? Theme.of(context).colorScheme.onBackground
-                                            : (theme?.colorScheme.onBackground ??
-                                            Colors.white)).withOpacity(0.6),
+                                                ? Theme.of(context)
+                                                    .colorScheme
+                                                    .onBackground
+                                                : (theme?.colorScheme
+                                                        .onBackground ??
+                                                    Colors.white))
+                                            .withOpacity(0.6),
                                       ),
                                     )
                                   ],

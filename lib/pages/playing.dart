@@ -146,45 +146,49 @@ class _PlayingPageState extends State<PlayingPage>
             padding: EdgeInsets.only(top: screenHeight * 0.18),
             child: Column(
               children: [
-                AnimatedBuilder(
-                  animation: _scaleAnimation,
-                  builder: (context, child) {
-                    return Transform.scale(
-                        scale: _scaleAnimation.value,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.2),
-                                spreadRadius: 5,
-                                blurRadius: 7,
-                                offset: const Offset(0, 3),
-                              ),
-                            ],
-                          ),
-                          child: ClipRRect(
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(16.0)),
-                            clipBehavior: Clip.hardEdge,
-                            child: Container(
-                              decoration: const BoxDecoration(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(16.0)),
-                              ),
-                              child: cover != ""
-                                  ? Image.file(
-                                      File(cover),
-                                      width: 300,
-                                      height: 300,
-                                    )
-                                  : Image.asset(
-                                      "assets/images/default_player_cover.jpg"),
-                            ),
-                          ),
-                        ));
-                  },
+                const SizedBox(
+                  width: 300,
+                  height: 300,
                 ),
+                // AnimatedBuilder(
+                //   animation: _scaleAnimation,
+                //   builder: (context, child) {
+                //     return Transform.scale(
+                //         scale: _scaleAnimation.value,
+                //         child: Container(
+                //           decoration: BoxDecoration(
+                //             borderRadius: BorderRadius.circular(16),
+                //             boxShadow: [
+                //               BoxShadow(
+                //                 color: Colors.black.withOpacity(0.2),
+                //                 spreadRadius: 5,
+                //                 blurRadius: 7,
+                //                 offset: const Offset(0, 3),
+                //               ),
+                //             ],
+                //           ),
+                //           child: ClipRRect(
+                //             borderRadius:
+                //             const BorderRadius.all(Radius.circular(16.0)),
+                //             clipBehavior: Clip.hardEdge,
+                //             child: Container(
+                //               decoration: const BoxDecoration(
+                //                 borderRadius:
+                //                 BorderRadius.all(Radius.circular(16.0)),
+                //               ),
+                //               child: cover != ""
+                //                   ? Image.file(
+                //                 File(cover),
+                //                 width: 300,
+                //                 height: 300,
+                //               )
+                //                   : Image.asset(
+                //                   "assets/images/default_player_cover.jpg"),
+                //             ),
+                //           ),
+                //         ));
+                //   },
+                // ),
                 Container(
                   padding: EdgeInsets.only(top: 48),
                   child: Column(

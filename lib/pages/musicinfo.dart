@@ -28,10 +28,10 @@ class _DebugState extends State<Debug> {
     // final info = await _flutterFFprobe
     // .getMediaInformation("/storage/emulated/0/MyMusic/miku/105558293.flac");
     final info = await _flutterFFprobe.getMediaInformation(file);
-    print("---START---");
+    // print("---START---");
     // print(info.getAllProperties()["format"]["tags"]["TITLE"]);
-    print(info.getMediaProperties());
-    print("---END---");
+    // print(info.getMediaProperties());
+    // print("---END---");
     final coverPath = (await getCover(file))??"null";
     setState(() {
       // outputText = info.getMediaProperties()?["tags"]["LYRICS"];

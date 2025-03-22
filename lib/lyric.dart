@@ -62,7 +62,7 @@ class Lyrics {
 
         if (type == LyricType.lrc) {
           double startTime =
-              processTime(lines[i].substring(1, lines[i].indexOf("]")));
+          processTime(lines[i].substring(1, lines[i].indexOf("]")));
           double endTime = -1;
           if (i < lines.length - 1) {
             // 不是最后一句，结束时间以下一句歌词的开始时间为准
@@ -86,14 +86,16 @@ class Lyrics {
         } else if (type == LyricType.eslyric) {
           if (regExpEsLyric2.hasMatch(lines[i])) {
             double startTime =
-                processTime(lines[i].substring(1, lines[i].indexOf("]")));
+            processTime(lines[i].substring(1, lines[i].indexOf("]")));
             double endTime = -1;
             if (i < lines.length - 1) {
               // 不是最后一句，结束时间以下一句歌词的开始时间为准
               endTime = processTime(
                   lines[i + 1].substring(1, lines[i + 1].indexOf("]")));
             }
-            endTime = processTime(lines[i].split("<").last);
+            endTime = processTime(lines[i]
+                .split("<")
+                .last);
             List<Map<String, dynamic>> words = [];
             List<Match> matches = regExpEsLyric3.allMatches(lines[i]).toList();
             for (var i = 0; i < matches.length; i++) {
@@ -101,7 +103,7 @@ class Lyrics {
               double wordStartTime = processTime(
                   match.group(0)!.substring(1, match.group(0)!.indexOf(">")));
               String wordText =
-                  match.group(0)!.substring(match.group(0)!.indexOf(">") + 1);
+              match.group(0)!.substring(match.group(0)!.indexOf(">") + 1);
               if (i < matches.length - 1) {
                 // words.add(LyricWord(
                 //     wordText,
@@ -135,7 +137,7 @@ class Lyrics {
             });
           } else {
             double startTime =
-                processTime(lines[i].substring(1, lines[i].indexOf("]")));
+            processTime(lines[i].substring(1, lines[i].indexOf("]")));
             double endTime = -1;
             if (i < lines.length - 1) {
               // 不是最后一句，结束时间以下一句歌词的开始时间为准
@@ -188,15 +190,14 @@ class LyricsView extends StatefulWidget {
   Color secondaryColor;
   Color primaryColor;
 
-  LyricsView(
-      {super.key,
-      required this.lrcs,
-      required this.time,
-      required this.padding,
-      required this.paddingTop,
-      required this.controller,
-      required this.secondaryColor,
-      required this.primaryColor});
+  LyricsView({super.key,
+    required this.lrcs,
+    required this.time,
+    required this.padding,
+    required this.paddingTop,
+    required this.controller,
+    required this.secondaryColor,
+    required this.primaryColor});
 
   @override
   State<LyricsView> createState() => _LyricsViewState();
@@ -223,6 +224,7 @@ class _LyricsViewState extends State<LyricsView> {
     // final primaryColor = Colors.red;
     const double fontSize = 22.0;
     const double maxFontSize = 28.0;
+    const double animationDuration = 1;
     const textStyle = TextStyle(
       fontSize: fontSize,
       fontWeight: FontWeight.bold,
@@ -257,11 +259,11 @@ class _LyricsViewState extends State<LyricsView> {
     String laterLyrics = "";
     int crtIdx = -1;
 
-    print(widget.lrcs.length);
+    // print(widget.lrcs.length);
     for (var i = 0; i < widget.lrcs.length; i++) {
-      if (i == 0 && widget.lrcs[i]["startTime"] < widget.time) {
-        nextLyric = widget.lrcs[i];
-      }
+      // if (i == 0 && widget.lrcs[i]["startTime"] < widget.time) {
+      //   nextLyric = widget.lrcs[i];
+      // }
       if (i != 0 && i != widget.lrcs.length - 1) {
         if (widget.lrcs[i - 1]["endTime"] <= widget.time &&
             widget.lrcs[i + 1]["startTime"] >= widget.time) {
@@ -285,13 +287,13 @@ class _LyricsViewState extends State<LyricsView> {
       //   lastLyric = widget.lrcs[i];
       //   continue;
       // }
-      if(i>=1&&widget.lrcs[i-1]["endTime"] <= widget.time){
-        if(i>=2){
+      if (i >= 1 && widget.lrcs[i - 1]["endTime"] <= widget.time) {
+        if (i >= 2) {
           previousLyrics +=
-              "${previousLyrics == ""? "" : "\n"}${lastLyric["text"]}";
+          "${previousLyrics == "" ? "" : "\n"}${lastLyric["text"]}";
         }
         // print("lastLyric: ${i-1}");
-        lastLyric = widget.lrcs[i-1];
+        lastLyric = widget.lrcs[i - 1];
       }
       if (widget.lrcs[i]["startTime"] > widget.time) {
         if (i > 1 &&
@@ -304,14 +306,14 @@ class _LyricsViewState extends State<LyricsView> {
         //   laterLyrics += widget.lrcs[i]["content"][j]["text"];
         // }
         laterLyrics +=
-            "${laterLyrics == "" ? "" : "\n"}${widget.lrcs[i]["text"]}";
+        "${laterLyrics == "" ? "" : "\n"}${widget.lrcs[i]["text"]}";
         continue;
       }
       currentLyric = widget.lrcs[i];
       crtIdx = i;
-      if (i < widget.lrcs.length - 1) {
-        nextLyric = widget.lrcs[i + 1];
-      }
+      // if (i < widget.lrcs.length - 1) {
+      //   nextLyric = widget.lrcs[i + 1];
+      // }
     }
     double progress = 1.0;
     try {
@@ -329,7 +331,9 @@ class _LyricsViewState extends State<LyricsView> {
         // pre += currentLyric["content"][i]["text"];
         children.add(Text(
           currentLyric["content"][i]["text"],
-          style: textStyle.copyWith(color: primaryColor),
+          style: textStyle.copyWith(color: primaryColor,
+              // fontSize: maxFontSize
+          ),
           // textAlign: TextAlign.start,
         ));
         continue;
@@ -338,7 +342,9 @@ class _LyricsViewState extends State<LyricsView> {
         // lat += currentLyric["content"][i]["text"];
         children.add(Text(
           currentLyric["content"][i]["text"],
-          style: textStyle.copyWith(color: secondaryColor),
+          style: textStyle.copyWith(color: secondaryColor,
+              // fontSize: maxFontSize
+          ),
           // textAlign: TextAlign.start,
         ));
         continue;
@@ -354,7 +360,9 @@ class _LyricsViewState extends State<LyricsView> {
       }
       children.add(GradientText(
           text: currentLyric["content"][i]["text"],
-          style: textStyle,
+          style: textStyle.copyWith(
+              // fontSize: maxFontSize
+          ),
           gradient: LinearGradient(
             colors: [
               primaryColor,
@@ -365,7 +373,7 @@ class _LyricsViewState extends State<LyricsView> {
             end: Alignment.centerRight,
           )));
     }
-    print("lastLyric: ${lastLyric["text"]}");
+    // print("lastLyric: ${1-max(0.0, min(((widget.time-lastLyric["endTime"])/animationDuration), 1.0))}");
     return Padding(
       padding: widget.padding,
       child: SingleChildScrollView(
@@ -385,41 +393,19 @@ class _LyricsViewState extends State<LyricsView> {
                 width: double.infinity,
                 child: Text(
                   lastLyric["text"],
-                  style: textStyle.copyWith(color: primaryColor),
+                  style: textStyle.copyWith(color: primaryColor,
+                      // fontSize: fontSize + (maxFontSize - fontSize)*Curves.easeInOut.transform(1-max(0.0, min(((widget.time-lastLyric["endTime"])/animationDuration), 1.0)))
+                  ),
                   textAlign: TextAlign.start,
                 )),
-            // Wrap(children: [Text(pre, textAlign: TextAlign.start,),GradientText(
-            //     text: crt,
-            //     style: textStyle,
-            //     gradient: LinearGradient(
-            //       colors: [
-            //         primaryColor,
-            //         secondaryColor,
-            //       ],
-            //       stops: [progress, progress],
-            //       begin: Alignment.centerLeft,
-            //       end: Alignment.centerRight,
-            //     )
-            // ),Text(lat, textAlign: TextAlign.start,)],),
-            // GradientText(
-            //   text: currentLyric["text"],
-            //   style: textStyle,
-            //   gradient: LinearGradient(
-            //     colors: [
-            //       primaryColor,
-            //       secondaryColor,
-            //     ],
-            //     stops: [progress, progress],
-            //     begin: Alignment.centerLeft,
-            //     end: Alignment.centerRight,
-            //   ),
-            // ),
             SizedBox(width: double.infinity, child: Wrap(children: children)),
             SizedBox(
                 width: double.infinity,
                 child: Text(
                   nextLyric["text"],
-                  style: textStyle.copyWith(color: secondaryColor),
+                  style: textStyle.copyWith(color: secondaryColor,
+                      // fontSize: fontSize + (maxFontSize - fontSize)*Curves.easeInOut.transform(1-max(0.0, min(((currentLyric["endTime"]-widget.time)/animationDuration), 1.0)))
+                  ),
                   textAlign: TextAlign.start,
                 )),
             SizedBox(
@@ -429,9 +415,11 @@ class _LyricsViewState extends State<LyricsView> {
                   style: textStyle.copyWith(color: secondaryColor),
                   textAlign: TextAlign.start,
                 )),
-            const SizedBox(
-              height: 3000,
-            )
+            Builder(builder: (context) {
+              return SizedBox(
+                height: MediaQuery.of(context).size.height/3,
+              );
+            })
           ])),
     );
   }

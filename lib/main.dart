@@ -1,11 +1,14 @@
+import 'dart:io';
 import 'dart:isolate';
 import 'dart:ui';
 
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:ionicons/ionicons.dart';
 import 'package:musiku/pages/index.dart';
 import 'package:musiku/pages/lyric.dart';
+import 'package:musiku/utool.dart';
 import 'package:permission_handler/permission_handler.dart'; // 导入权限处理包
 import 'package:musiku/const.dart';
 import 'package:musiku/global.dart';
@@ -23,6 +26,7 @@ import 'package:musiku/pages/settings.dart';
 import 'package:musiku/pages/text_page.dart';
 import 'package:musiku/usersettings.dart';
 import 'package:dynamic_color/dynamic_color.dart';
+import 'auto_scrolling_text.dart';
 import 'background.dart';
 
 Future<void> main() async {
@@ -252,10 +256,14 @@ class App extends StatefulWidget {
 class _AppState extends State<App> {
   // 当前选中的页面索引
   int _selectedIndex = 0;
+  String cover = "";
+  ThemeData theme = ThemeData();
 
   @override
   void initState() {
     super.initState();
+    _init();
+    refresh(auto: true);
   }
 
   // 定义不同页面的内容
@@ -268,6 +276,30 @@ class _AppState extends State<App> {
   ];
 
   final PageController _pageController = PageController(keepPage: true);
+
+  Future<void> _init() async {
+    if (Global.playingIndex != -1) {
+      cover = (await getCover(Global.playlist[Global.playingIndex]))!;
+      theme = ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor:
+              (await getPaletteGeneratorFromImage(cover))!.dominantColor!.color,
+          brightness: MediaQuery.of(context).platformBrightness,
+        ),
+        useMaterial3: true,
+      );
+    }
+  }
+
+  Future<void> refresh({bool auto = false}) async {
+    await _init();
+    // print("cover $cover");
+    setState(() {});
+    if (auto && mounted) {
+      Future.delayed(
+          const Duration(milliseconds: 500), () => refresh(auto: true));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -313,17 +345,188 @@ class _AppState extends State<App> {
         children: _widgetOptions,
       ),
       floatingActionButton: Global.playingIndex != -1
-          ? FloatingActionButton(
-              onPressed: () {
-                Navigator.pushNamed(context, "/player");
-              },
-              child: const Icon(Icons.music_note),
-            )
+          ?
+          // FloatingActionButton(
+          //   onPressed: () {
+          //     Navigator.pushNamed(context, "/player");
+          //   },
+          //   child: const Icon(Icons.music_note),
+          // )
+          Builder(builder: (context) {
+              return ClipRRect(
+                borderRadius: BorderRadius.circular(16 + 15),
+                child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+                    child: SizedBox(
+                        width: MediaQuery.of(context).size.width - 32,
+                        height: 100,
+                        child: Stack(children: [
+                          InkWell(
+                              onTap: () {
+                                Navigator.pushNamed(context, "/player");
+                                _init();
+                                setState(() {});
+                              },
+                              child: Container(
+                                color: theme.colorScheme.primaryContainer
+                                    .withOpacity(0.5),
+                              )),
+                          Row(children: [
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 15, top: 15, bottom: 15),
+                              child: InkWell(
+                                  onTap: () {
+                                    Navigator.pushNamed(context, "/player");
+                                    _init();
+                                    setState(() {});
+                                  },
+                                  child: Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(16),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color:
+                                                Colors.black.withOpacity(0.2),
+                                            spreadRadius: 5,
+                                            blurRadius: 7,
+                                            offset: const Offset(0, 3),
+                                          ),
+                                        ],
+                                      ),
+                                      child: ClipRRect(
+                                        borderRadius: const BorderRadius.all(
+                                            Radius.circular(16.0)),
+                                        clipBehavior: Clip.hardEdge,
+                                        child: Container(
+                                          decoration: const BoxDecoration(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(16.0)),
+                                          ),
+                                          child: cover != ""
+                                              ? Image.file(
+                                                  File(cover),
+                                                  width: 70,
+                                                  height: 70,
+                                                )
+                                              : Image.asset(
+                                                  "assets/images/default_player_cover.jpg"),
+                                        ),
+                                      ))),
+                            ),
+                            SizedBox(width: 15),
+                            Expanded(
+                                child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                AutoScrollingText(
+                                  text: Global.musicInfo[Global
+                                              .playlist[Global.playingIndex]]
+                                          ?["title"] ??
+                                      Global.playlist[Global.playingIndex]
+                                          .split("/")
+                                          .last,
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: theme.colorScheme.onPrimaryContainer
+                                        .withOpacity(0.8),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                // const SizedBox(height: 4),
+                                AutoScrollingText(
+                                  text: Global.musicInfo[Global
+                                              .playlist[Global.playingIndex]]
+                                          ?["artist"] ??
+                                      "",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: theme.colorScheme.onPrimaryContainer
+                                        .withOpacity(0.6),
+                                  ),
+                                ),
+                                SizedBox(
+                                    width: double.infinity,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.end,
+                                      // crossAxisAlignment:
+                                      //     CrossAxisAlignment.center,
+                                      children: [
+                                        IconButton(
+                                          icon: Icon(Ionicons.play_back,
+                                              color: theme
+                                                  .colorScheme.onPrimaryContainer
+                                                  .withOpacity(0.6),
+                                              size: 24),
+                                          onPressed: () async {
+                                            await Global.player.previous();
+                                            refresh();
+                                            setState(() {});
+                                          },
+                                        ),
+                                        const SizedBox(width: 8),
+                                        IconButton(
+                                          icon: Transform.translate(
+                                            offset: Global.player.player.playing
+                                                ? const Offset(0, 0)
+                                                : const Offset(4, 0),
+                                            child: Icon(
+                                              Global.player.player.playing
+                                                  ? Ionicons.pause
+                                                  : Ionicons.play,
+                                              color: theme
+                                                  .colorScheme.onPrimaryContainer
+                                                  .withOpacity(0.6),
+                                              size: 24,
+                                            ),
+                                          ),
+                                          onPressed: () async {
+                                            if (Global.player.player.playing) {
+                                              await Global.player.pause();
+                                            } else {
+                                              await Global.player.play();
+                                            }
+                                            // Global.player.setInfo();
+                                            refresh();
+                                            setState(() {});
+                                          },
+                                        ),
+                                        const SizedBox(width: 8),
+                                        IconButton(
+                                          icon: Icon(Ionicons.play_forward,
+                                              color: theme
+                                                  .colorScheme.onPrimaryContainer
+                                                  .withOpacity(0.6),
+                                              size: 24),
+                                          onPressed: () async {
+                                            await Global.player.next();
+                                            refresh();
+                                            setState(() {});
+                                          },
+                                        ),
+                                        const SizedBox(width: 115,)
+                                      ],
+                                    ))
+                              ],
+                            ))
+                          ]),
+                          // Positioned(
+                          //     left:
+                          //         (MediaQuery.of(context).size.width - 32) / 2 -
+                          //             44,
+                          //     bottom: 15,
+                          //     child: )
+                        ]))),
+              );
+            })
           : null,
       bottomNavigationBar: ClipRRect(
           child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
         child: NavigationBar(
+          labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
           // backgroundColor: Colors.transparent,
           // elevation: 0,
           backgroundColor:
