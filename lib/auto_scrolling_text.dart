@@ -15,10 +15,10 @@ class AutoScrollingText extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _AutoScrollingTextState createState() => _AutoScrollingTextState();
+  AutoScrollingTextState createState() => AutoScrollingTextState();
 }
 
-class _AutoScrollingTextState extends State<AutoScrollingText>
+class AutoScrollingTextState extends State<AutoScrollingText>
     with TickerProviderStateMixin {
   late ScrollController _scrollController;
   late AnimationController _animationController;

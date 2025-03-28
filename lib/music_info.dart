@@ -6,9 +6,9 @@ import 'package:musiku/utool.dart';
 import 'global.dart';
 
 class MusicInfo extends StatefulWidget {
-  String path;
+  final String path;
 
-  MusicInfo({super.key, required this.path});
+  const MusicInfo({super.key, required this.path});
 
   @override
   State<MusicInfo> createState() => _MusicInfoState();

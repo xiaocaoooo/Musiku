@@ -1,9 +1,6 @@
 import 'dart:isolate';
-
 import 'package:flutter/material.dart';
 import 'package:musiku/player.dart';
-
-import 'background.dart';
 
 class Global {
   static bool firstRun = true;

@@ -1,7 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:musiku/utool.dart';
-import 'dart:math';
 import 'gradient_text.dart';
 
 class LyricType {
@@ -182,16 +180,16 @@ class Lyrics {
 }
 
 class LyricsView extends StatefulWidget {
-  List<Map<String, dynamic>> lrcs;
-  double time;
-  EdgeInsets padding = EdgeInsets.zero;
-  double paddingTop = 0;
-  ScrollController controller;
-  Color secondaryColor;
-  Color primaryColor;
+  final List<Map<String, dynamic>> lyrics;
+  final double time;
+  final EdgeInsets padding;
+  final double paddingTop;
+  final ScrollController controller;
+  final Color secondaryColor;
+  final Color primaryColor;
 
-  LyricsView({super.key,
-    required this.lrcs,
+  const LyricsView({super.key,
+    required this.lyrics,
     required this.time,
     required this.padding,
     required this.paddingTop,
@@ -223,8 +221,8 @@ class _LyricsViewState extends State<LyricsView> {
     // final secondaryColor = Colors.green;
     // final primaryColor = Colors.red;
     const double fontSize = 22.0;
-    const double maxFontSize = 28.0;
-    const double animationDuration = 1;
+    // const double maxFontSize = 28.0;
+    // const double animationDuration = 1;
     const textStyle = TextStyle(
       fontSize: fontSize,
       fontWeight: FontWeight.bold,
@@ -257,20 +255,20 @@ class _LyricsViewState extends State<LyricsView> {
       ]
     };
     String laterLyrics = "";
-    int crtIdx = -1;
+    // int crtIdx = -1;
 
     // print(widget.lrcs.length);
-    for (var i = 0; i < widget.lrcs.length; i++) {
+    for (var i = 0; i < widget.lyrics.length; i++) {
       // if (i == 0 && widget.lrcs[i]["startTime"] < widget.time) {
       //   nextLyric = widget.lrcs[i];
       // }
-      if (i != 0 && i != widget.lrcs.length - 1) {
-        if (widget.lrcs[i - 1]["endTime"] <= widget.time &&
-            widget.lrcs[i + 1]["startTime"] >= widget.time) {
-          currentLyric = widget.lrcs[i];
-          crtIdx = i;
-          if (i < widget.lrcs.length - 1) {
-            nextLyric = widget.lrcs[i + 1];
+      if (i != 0 && i != widget.lyrics.length - 1) {
+        if (widget.lyrics[i - 1]["endTime"] <= widget.time &&
+            widget.lyrics[i + 1]["startTime"] >= widget.time) {
+          currentLyric = widget.lyrics[i];
+          // crtIdx = i;
+          if (i < widget.lyrics.length - 1) {
+            nextLyric = widget.lyrics[i + 1];
           }
         }
       }
@@ -287,18 +285,18 @@ class _LyricsViewState extends State<LyricsView> {
       //   lastLyric = widget.lrcs[i];
       //   continue;
       // }
-      if (i >= 1 && widget.lrcs[i - 1]["endTime"] <= widget.time) {
+      if (i >= 1 && widget.lyrics[i - 1]["endTime"] <= widget.time) {
         if (i >= 2) {
           previousLyrics +=
           "${previousLyrics == "" ? "" : "\n"}${lastLyric["text"]}";
         }
         // print("lastLyric: ${i-1}");
-        lastLyric = widget.lrcs[i - 1];
+        lastLyric = widget.lyrics[i - 1];
       }
-      if (widget.lrcs[i]["startTime"] > widget.time) {
+      if (widget.lyrics[i]["startTime"] > widget.time) {
         if (i > 1 &&
-            widget.lrcs[i - 2]["endTime"] <= widget.time &&
-            widget.lrcs[i]["startTime"] >= widget.time) {
+            widget.lyrics[i - 2]["endTime"] <= widget.time &&
+            widget.lyrics[i]["startTime"] >= widget.time) {
           continue;
         }
         // laterLyrics += laterLyrics == "" ? "" : "\n";
@@ -306,19 +304,19 @@ class _LyricsViewState extends State<LyricsView> {
         //   laterLyrics += widget.lrcs[i]["content"][j]["text"];
         // }
         laterLyrics +=
-        "${laterLyrics == "" ? "" : "\n"}${widget.lrcs[i]["text"]}";
+        "${laterLyrics == "" ? "" : "\n"}${widget.lyrics[i]["text"]}";
         continue;
       }
-      currentLyric = widget.lrcs[i];
-      crtIdx = i;
+      currentLyric = widget.lyrics[i];
+      // crtIdx = i;
       // if (i < widget.lrcs.length - 1) {
       //   nextLyric = widget.lrcs[i + 1];
       // }
     }
-    double progress = 1.0;
+    // double progress = 1.0;
     try {
-      progress = (widget.time - currentLyric["startTime"]) /
-          (currentLyric["endTime"] - currentLyric["startTime"]);
+      // progress = (widget.time - currentLyric["startTime"]) /
+      //     (currentLyric["endTime"] - currentLyric["startTime"]);
     } catch (e) {
       //
     }

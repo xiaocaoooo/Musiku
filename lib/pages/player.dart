@@ -1,17 +1,12 @@
-import 'dart:ffi';
 import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:ionicons/ionicons.dart';
-import 'package:musiku/auto_scrolling_text.dart';
 import 'package:musiku/global.dart';
 import 'package:musiku/pages/lyric.dart';
 import 'package:musiku/pages/playing.dart';
 import 'package:musiku/utool.dart';
 import 'package:musiku/usersettings.dart';
 import 'package:palette_generator/palette_generator.dart';
-
-import '../lyric.dart';
 
 class PlayerPage extends StatefulWidget {
   final String? path;
@@ -171,7 +166,7 @@ class _PlayerPageState extends State<PlayerPage> with TickerProviderStateMixin {
                   position: _slideAnimation,
                   child: PageView(
                       controller: _pageController,
-                      children: [const PlayingPage(), LyricPage()])),
+                      children: const [PlayingPage(), LyricPage()])),
               Builder(builder: (context) {
                 final l1 = MediaQuery.of(context).size.width / 2 - 150;
                 const l2 = 25;

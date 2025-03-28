@@ -1,8 +1,6 @@
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:ui';
-
-import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ionicons/ionicons.dart';
@@ -39,7 +37,7 @@ Future<void> main() async {
   checkAndRequestAudioPermission();
 
   Global.isolate =
-      await Isolate.spawn(BackgroundTask, Global.receivePort.sendPort);
+      await Isolate.spawn(backgroundTask, Global.receivePort.sendPort);
 
   runApp(const MyApp());
 }
@@ -167,7 +165,7 @@ class _MyAppState extends State<MyApp> {
               return PlayerPage(path: path);
             },
             // "/player": (context) => const PlayerPage(),
-            "/lyric": (context) => LyricPage(),
+            "/lyric": (context) => const LyricPage(),
             "/index": (context) => const IndexPage(),
           },
         );
@@ -414,7 +412,7 @@ class _AppState extends State<App> {
                                         ),
                                       ))),
                             ),
-                            SizedBox(width: 15),
+                            const SizedBox(width: 15),
                             Expanded(
                                 child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,

@@ -22,12 +22,12 @@ class _DebugState extends State<Debug> {
   }
 
   Future<void> ff() async {
-    final FlutterFFprobe _flutterFFprobe = FlutterFFprobe();
+    final FlutterFFprobe flutterFFprobe = FlutterFFprobe();
     // const file = "/storage/emulated/0/MyMusic/miku/105558236.mp3";
     const file = "/storage/emulated/0/MyMusic/miku/201451969.flac";
     // final info = await _flutterFFprobe
     // .getMediaInformation("/storage/emulated/0/MyMusic/miku/105558293.flac");
-    final info = await _flutterFFprobe.getMediaInformation(file);
+    final info = await flutterFFprobe.getMediaInformation(file);
     // print("---START---");
     // print(info.getAllProperties()["format"]["tags"]["TITLE"]);
     // print(info.getMediaProperties());

@@ -40,7 +40,7 @@ class _IndexPageState extends State<IndexPage> {
           .map((entity) => entity.path)
           .toList();
       for (var music in ml) {
-        // await Future.delayed(const Duration(milliseconds: 10));
+        // await Future.delayed(const Duration(milliseconds: 50));
         _processSingleMusic(music);
       }
     }
@@ -49,9 +49,9 @@ class _IndexPageState extends State<IndexPage> {
 
   Future<void> _processSingleMusic(String music) async {
     // final flag = (await UserSettings.getMusicList()).contains(music);
-    // await getCover(music);
     // await getMusicMetadata(music);
     await getMusicMetadata(music);
+    // await getCover(music);
     setState(() {
       _processedMusicCount++; // 增加已处理的音乐文件数量
     });
@@ -128,11 +128,11 @@ class _IndexPageState extends State<IndexPage> {
           children: [
             CircularProgressIndicator(
               value: _processedMusicCount /
-                  (_musicList.length != 0 ? _musicList.length : 1),
+                  (_musicList.isNotEmpty ? _musicList.length : 1),
             ),
             const SizedBox(height: 16),
             Text(
-                '$_processedMusicCount/${(_musicList.length != 0 ? _musicList.length : "NaN")}',
+                '$_processedMusicCount/${(_musicList.isNotEmpty ? _musicList.length : "NaN")}',
                 style: TextStyle(
                     color: Theme.of(context).colorScheme.onSecondaryContainer)),
           ],

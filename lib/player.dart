@@ -1,5 +1,4 @@
 import 'package:audio_service/audio_service.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:musiku/global.dart';
 import 'package:musiku/userdata.dart';
@@ -15,24 +14,28 @@ class Player extends BaseAudioHandler
   bool playing = false;
 
   // The most common callbacks:
+  @override
   Future<void> play() async {
     await player.play();
     setInfo();
     playing = player.playing;
   }
 
+  @override
   Future<void> pause() async {
     await player.pause();
     setInfo();
     playing = player.playing;
   }
 
+  @override
   Future<void> stop() async {
     await player.stop();
     setInfo();
     playing = player.playing;
   }
 
+  @override
   Future<void> seek(Duration position) async {
     await player.seek(position);
     setInfo();

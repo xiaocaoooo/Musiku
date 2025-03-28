@@ -39,18 +39,18 @@ class _DebugState extends State<Debug> {
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
-          title: Text('需要存储权限'),
+          title: const Text('需要存储权限'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: Text('取消'),
+              child: const Text('取消'),
             ),
             TextButton(
               onPressed: () {
                 Navigator.pop(ctx);
                 _requestPermission(); // 重新请求
               },
-              child: Text('重试'),
+              child: const Text('重试'),
             ),
           ],
         ),
@@ -115,7 +115,7 @@ class _DebugState extends State<Debug> {
         return ListTile(
           leading: Icon(isDir ? Icons.folder : Icons.insert_drive_file),
           title: Text(entity.path.split('/').last),
-          onTap: isDir ? () => _navigateTo(entity as Directory) : null,
+          onTap: isDir ? () => _navigateTo(entity) : null,
         );
       },
     );

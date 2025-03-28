@@ -24,7 +24,7 @@ class _InfoState extends State<Info> {
 
   @override
   Widget build(BuildContext context) {
-    List<List<dynamic>> _items = [
+    List<List<dynamic>> items = [
       [
         "QQ",
         Icons.chat_rounded,
@@ -32,7 +32,7 @@ class _InfoState extends State<Info> {
           try {
             String groupNumber = await getGroupNumber();
             String url =
-                'mqqapi://card/show_pslcard?src_type=internal&version=1&uin=${groupNumber}&card_type=group&source=qrcode';
+                'mqqapi://card/show_pslcard?src_type=internal&version=1&uin=$groupNumber&card_type=group&source=qrcode';
             // String url = "https://xiaocaoooo.github.io";
             // print(url);
             if (!await launchUrl(Uri.parse(url))) {
@@ -103,22 +103,22 @@ class _InfoState extends State<Info> {
       )),
       body: SafeArea(
         child: ListView.builder(
-          itemCount: _items.length,
+          itemCount: items.length,
           itemBuilder: (BuildContext context, int index) {
             return ListTile(
               leading: Icon(
-                _items[index][1],
+                items[index][1],
                 size: 30,
                 color: Theme.of(context).colorScheme.onSecondaryContainer,
               ),
               title: Text(
-                _items[index][0],
+                items[index][0],
                 style: TextStyle(
                     color: Theme.of(context).colorScheme.onSecondaryContainer),
               ),
               trailing: Icon(Icons.chevron_right,
                   color: Theme.of(context).colorScheme.onSecondaryContainer),
-              onTap: _items[index][2],
+              onTap: items[index][2],
             );
           },
         ),

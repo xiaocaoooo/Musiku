@@ -1,12 +1,8 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:musiku/const.dart';
 import 'package:musiku/global.dart';
 import 'package:musiku/usersettings.dart';
-import 'package:musiku/utool.dart';
-
 import '../music_info.dart';
 
 class MusicListPage extends StatefulWidget {
@@ -21,8 +17,6 @@ class MusicListPage extends StatefulWidget {
 
 class _MusicListPageState extends State<MusicListPage> {
   final List<String> _musicList = [];
-
-  int _processedMusicCount = 0; // 已处理的音乐文件数量
 
   Future<void> _init() async {
     if (widget.path == Const.all) {
@@ -93,21 +87,6 @@ class _MusicListPageState extends State<MusicListPage> {
     // 排序操作
     _sortMusicList();
     setState(() {});
-  }
-
-  Future<void> _processSingleMusic(String music) async {
-    // final flag = (await UserSettings.getMusicList()).contains(music);
-    // await getCover(music);
-    // await getMusicMetadata(music);
-    await getMusicMetadata(music);
-    setState(() {
-      _processedMusicCount++; // 增加已处理的音乐文件数量
-    });
-    // print("musiclist: $music ($_processedMusicCount/${_musicList.length})");
-    // if (!flag) {
-    //   _sortMusicList();
-    // }
-    // setState(() {}); // 更新界面以显示元数据
   }
 
   void _sortMusicList() {

@@ -1,21 +1,18 @@
 import 'dart:async';
-import 'dart:ffi';
-import 'dart:io';
-import 'dart:math';
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:ionicons/ionicons.dart';
 import 'package:musiku/auto_scrolling_text.dart';
 import 'package:musiku/global.dart';
 import 'package:musiku/utool.dart';
 import 'package:musiku/usersettings.dart';
 import 'package:palette_generator/palette_generator.dart';
+import 'package:wakelock/wakelock.dart';
 
 import '../android_native.dart';
 import '../lyric.dart';
 
 class LyricPage extends StatefulWidget {
-  LyricPage({super.key});
+  const LyricPage({super.key});
 
   @override
   State<LyricPage> createState() => _LyricPageState();
@@ -87,8 +84,7 @@ class _LyricPageState extends State<LyricPage>
         position =
             Global.player.player.position.inMilliseconds.toDouble() / 1000;
         duration =
-            Global.player.player.duration!.inMilliseconds.toDouble() / 1000 ??
-                duration;
+            Global.player.player.duration!.inMilliseconds.toDouble() / 1000;
         lrcs = lyrics!;
         Global.lrcs = lrcs;
         for (int i = 0; i < lrcs.length; i++) {
@@ -190,13 +186,15 @@ class _LyricPageState extends State<LyricPage>
     // WidgetsBinding.instance.addPersistentFrameCallback((_) {
     //   refresh();
     // });
+    Wakelock.enable();
     _init();
   }
 
   @override
   void dispose() {
-    super.dispose();
     _controller.dispose();
+    Wakelock.disable();
+    super.dispose();
     // Timer.periodic(const Duration(milliseconds: 50), (timer) {
     //   refresh(auto: true);
     // }).cancel();
@@ -221,21 +219,19 @@ class _LyricPageState extends State<LyricPage>
       //     color: Colors.black.withOpacity(0.1),
       //   ),
       // ),
-      Container(
-        child: LyricsView(
-          lrcs: lyrics ?? [],
-          time: position,
-          padding: const EdgeInsets.symmetric(horizontal: 28),
-          paddingTop: 200,
-          controller: controller,
-          secondaryColor: (themeIndex == 1
-                  ? Theme.of(context).colorScheme.onBackground
-                  : (theme?.colorScheme.onBackground ?? Colors.white))
-              .withOpacity(0.5),
-          primaryColor: (themeIndex == 1
-              ? Theme.of(context).colorScheme.primary
-              : (theme?.colorScheme.primary ?? Colors.white)),
-        ),
+      LyricsView(
+        lyrics: lyrics ?? [],
+        time: position,
+        padding: const EdgeInsets.symmetric(horizontal: 28),
+        paddingTop: 200,
+        controller: controller,
+        secondaryColor: (themeIndex == 1
+                ? Theme.of(context).colorScheme.onBackground
+                : (theme?.colorScheme.onBackground ?? Colors.white))
+            .withOpacity(0.5),
+        primaryColor: (themeIndex == 1
+            ? Theme.of(context).colorScheme.primary
+            : (theme?.colorScheme.primary ?? Colors.white)),
       ),
       ClipRRect(
           borderRadius: const BorderRadius.only(

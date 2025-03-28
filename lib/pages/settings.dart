@@ -12,7 +12,7 @@ class Settings extends StatefulWidget {
 class _SettingsState extends State<Settings> {
   String? _selectedLanguage;
   int? _selectedTheme;
-  static List<String> _theme=[
+  static final List<String> _theme=[
     "封面取色",
     "跟随系统",
     "封面模糊"
@@ -99,7 +99,7 @@ class _SettingsState extends State<Settings> {
 
   @override
   Widget build(BuildContext context) {
-    List<List<dynamic>> _settings = [
+    List<List<dynamic>> settings = [
       [Const.language, Icons.language, DropdownMenu<String>(
         initialSelection: _selectedLanguage,
         onSelected: (String? value) {
@@ -149,7 +149,7 @@ class _SettingsState extends State<Settings> {
       )),
       body: SafeArea(
         child: ListView.builder(
-          itemCount: _settings.length,
+          itemCount: settings.length,
           itemBuilder: (BuildContext context, int index) {
             return Padding(
               padding: const EdgeInsets.only(
@@ -158,15 +158,15 @@ class _SettingsState extends State<Settings> {
                 height: 64,
                 child: ListTile(
                   title: Text(
-                    _settings[index][0],
+                    settings[index][0],
                     style: TextStyle(
                         color: Theme.of(context).colorScheme.onSecondaryContainer),
                   ),
                   leading: Icon(
-                    _settings[index][1],
+                    settings[index][1],
                     color: Theme.of(context).colorScheme.onSecondaryContainer,
                   ),
-                  trailing: _settings[index][2],
+                  trailing: settings[index][2],
                 )
               )
             );

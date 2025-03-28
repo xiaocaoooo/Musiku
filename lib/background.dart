@@ -2,7 +2,7 @@ import 'dart:isolate';
 import 'android_native.dart';
 import 'global.dart';
 
-Future<void> BackgroundTask(SendPort sendPort) async {
+Future<void> backgroundTask(SendPort sendPort) async {
   int idx = -1;
   int lastIdx = -1;
   while (true) {
@@ -26,6 +26,6 @@ Future<void> BackgroundTask(SendPort sendPort) async {
       lastIdx = idx;
     }
     // print(lrcs[idx]["content"].map((e) => e["text"]).join());
-    await Future.delayed(Duration(milliseconds: 50));
+    await Future.delayed(const Duration(milliseconds: 50));
   }
 }

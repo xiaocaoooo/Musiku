@@ -1,6 +1,3 @@
-import 'dart:ffi';
-import 'dart:io';
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:musiku/auto_scrolling_text.dart';
@@ -8,7 +5,6 @@ import 'package:musiku/global.dart';
 import 'package:musiku/utool.dart';
 import 'package:musiku/usersettings.dart';
 import 'package:palette_generator/palette_generator.dart';
-
 import '../lyric.dart';
 
 class PlayingPage extends StatefulWidget {
@@ -38,7 +34,7 @@ class _PlayingPageState extends State<PlayingPage>
       PaletteGenerator.fromColors([PaletteColor(const Color(0xFF39C5BB), 1)]);
 
   late AnimationController _scaleController;
-  late Animation<double> _scaleAnimation;
+  // late Animation<double> _scaleAnimation;
 
   Future<void> initData() async {
     getMusicMetadata(path, cache: false);
@@ -89,12 +85,12 @@ class _PlayingPageState extends State<PlayingPage>
 
   Future<void> setScale(double value) async {
     _scaleController.reset();
-    _scaleAnimation = Tween<double>(begin: scale, end: value).animate(
-      CurvedAnimation(
-        parent: _scaleController,
-        curve: Curves.easeInOut,
-      ),
-    );
+    // _scaleAnimation = Tween<double>(begin: scale, end: value).animate(
+    //   CurvedAnimation(
+    //     parent: _scaleController,
+    //     curve: Curves.easeInOut,
+    //   ),
+    // );
     setState(() {
       scale = value;
     });
@@ -114,12 +110,12 @@ class _PlayingPageState extends State<PlayingPage>
       vsync: this,
       duration: const Duration(milliseconds: 200),
     );
-    _scaleAnimation = Tween<double>(begin: scale, end: scale).animate(
-      CurvedAnimation(
-        parent: _scaleController,
-        curve: Curves.easeInOut,
-      ),
-    );
+    // _scaleAnimation = Tween<double>(begin: scale, end: scale).animate(
+    //   CurvedAnimation(
+    //     parent: _scaleController,
+    //     curve: Curves.easeInOut,
+    //   ),
+    // );
   }
 
   @override
@@ -190,7 +186,7 @@ class _PlayingPageState extends State<PlayingPage>
                 //   },
                 // ),
                 Container(
-                  padding: EdgeInsets.only(top: 48),
+                  padding: const EdgeInsets.only(top: 48),
                   child: Column(
                     children: [
                       SizedBox(

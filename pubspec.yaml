@@ -43,6 +43,8 @@ dependencies:
 #  mmoo_lyric: ^1.0.0
   plugin_platform_interface: ^2.1.8
   fluttertoast: ^8.2.5
+  wakelock: ^0.6.2
+  path: ^1.8.3
 
 dev_dependencies:
   flutter_test:

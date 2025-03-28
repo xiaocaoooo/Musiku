@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:musiku/global.dart';
 import 'package:musiku/music_info.dart';
-import 'package:musiku/utool.dart';
 
 class PlaylistPage extends StatefulWidget {
   const PlaylistPage({super.key});

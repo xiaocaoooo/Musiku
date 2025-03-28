@@ -1,8 +1,6 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:palette_generator/palette_generator.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:convert';
 
@@ -135,7 +133,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
         // appBar: AppBar(title: const Text("Home")),
         body: Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
           Padding(
@@ -197,11 +195,12 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ])),
               )),
-          // 新增的外层 Column，用于包裹多个公告容器
-          Column(
-            children: announcements.map((announcement) {
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
+          Builder(builder: (context) {
+            List<Widget> children = [];
+            for (var i = 0; i < announcements.length; i++) {
+              var announcement = announcements[i];
+              children.add(Padding(
+                padding: const EdgeInsets.only(bottom: 4.0),
                 child: Container(
                   // 宽度设为无限大，实现全宽效果
                   width: double.infinity,
@@ -211,7 +210,12 @@ class _HomePageState extends State<HomePage> {
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.primaryContainer,
                     // 设置圆角半径
-                    borderRadius: const BorderRadius.all(Radius.circular(16.0)),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(i==0?16.0:0.0),
+                      topRight: Radius.circular(i==0?16.0:0.0),
+                      bottomLeft: Radius.circular(i==announcements.length-1?16.0:0.0),
+                      bottomRight: Radius.circular(i==announcements.length-1?16.0:0.0),
+                    ),
                   ),
                   child: Padding(
                       padding: const EdgeInsets.all(16.0),
@@ -259,9 +263,10 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ])),
                 ),
-              );
-            }).toList(),
-          ),
+              ));
+            }
+            return Column(children: children);
+          }),
         ],
       ),
     ));

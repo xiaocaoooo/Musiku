@@ -22,7 +22,7 @@ class _MorePageState extends State<MorePage> {
     return Scaffold(
       // appBar: AppBar(title: const Text("More")),
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             Container(

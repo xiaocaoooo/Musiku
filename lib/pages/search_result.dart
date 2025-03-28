@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:musiku/music_info.dart';
-import 'package:musiku/utool.dart';
 
 import '../global.dart';
 
